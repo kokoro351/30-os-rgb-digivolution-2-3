@@ -111,9 +111,15 @@ const UPGRADES = [
   { id: "power", name: "Attack Kernel", desc: "攻撃力 +18%。Vaccine 進化へ寄る。", type: "Vaccine" },
   { id: "speed", name: "Clock Boost", desc: "移動速度 +12%。Data 進化へ寄る。", type: "Data" },
   { id: "area", name: "Wide Bus", desc: "攻撃範囲 +16%。Virus 進化へ寄る。", type: "Virus" },
-  { id: "regen", name: "Repair Thread", desc: "HPを回復し最大HP +10。Free 進化へ寄る。", type: "Free" },
+  { id: "regen", name: "Repair Thread", desc: "HP回復、最大HP +10。Free 進化へ寄る。", type: "Free" },
   { id: "cooldown", name: "Async Cast", desc: "攻撃間隔 -10%。Data 進化へ寄る。", type: "Data" },
-  { id: "magnet", name: "Data Magnet", desc: "データ吸収範囲 +24%。Free 進化へ寄る。", type: "Free" }
+  { id: "magnet", name: "Data Magnet", desc: "データ吸収範囲 +24%。Free 進化へ寄る。", type: "Free" },
+  { id: "shield", name: "Damage Shield", desc: "接触シールドで近くの敵を焼き、被弾も軽減。", type: "Vaccine" },
+  { id: "drones", name: "Attack Drone", desc: "自動射撃ドローンを1機追加。周回して援護。", type: "Data" },
+  { id: "beam", name: "Pierce Beam", desc: "通常弾が貫通し、射程と威力も少し上昇。", type: "Vaccine" },
+  { id: "orbit", name: "Orbit Blade", desc: "周回するデータ刃で周囲の敵を切り裂く。", type: "Virus" },
+  { id: "chain", name: "Chain Spark", desc: "弾が命中時に近くの敵へ連鎖ダメージ。", type: "Data" },
+  { id: "nova", name: "Data Nova", desc: "一定間隔で周囲にデータ爆発を発生。", type: "Free" }
 ];
 
 const SPRITES = Object.fromEntries(FORMS.map((form) => [form.id, `assets/sprites/${form.id}.png`]));
@@ -141,6 +147,8 @@ let pausedForChoice = false;
 let evolutionLock = false;
 let gameEnded = false;
 let audioCtx = null;
+let resizeQueued = true;
+let nextEnemyId = 1;
 
 const state = createInitialState();
 
@@ -164,6 +172,16 @@ function createInitialState() {
       cooldown: 0.72,
       cooldownLeft: 0,
       magnet: 84,
+      effects: {
+        shield: 0,
+        drones: 0,
+        beam: 0,
+        orbit: 0,
+        chain: 0,
+        nova: 0
+      },
+      droneCooldown: 0,
+      novaCooldown: 0,
       skills: []
     },
     data: { Vaccine: 0, Data: 0, Virus: 0, Free: 0 },
@@ -195,6 +213,8 @@ function resetGame() {
   ui.levelPanel.classList.add("hidden");
   ui.evolutionOverlay.classList.add("hidden");
   ui.gameOverPanel.classList.add("hidden");
+  resetTouchMove();
+  nextEnemyId = 1;
   lastTime = performance.now();
 }
 
@@ -252,6 +272,7 @@ function spawnEnemy(forceBoss = false) {
   const y = clamp(state.player.y + Math.sin(angle) * distance, 60, state.worldSize - 60);
 
   state.enemies.push({
+    id: nextEnemyId++,
     x,
     y,
     type,
@@ -295,6 +316,7 @@ function update(dt) {
   }
 
   updatePlayer(dt);
+  updatePassiveEffects(dt);
   updateEnemies(dt);
   updateProjectiles(dt);
   updatePickups(dt);
@@ -304,6 +326,26 @@ function update(dt) {
   if (state.elapsed >= 30 * 60) {
     endGame(true);
   }
+}
+
+function resizeCanvasToDisplay() {
+  const rect = canvas.getBoundingClientRect();
+  const ratio = Math.min(2, window.devicePixelRatio || 1);
+  const width = Math.max(320, Math.round(rect.width * ratio));
+  const height = Math.max(360, Math.round(rect.height * ratio));
+  if (canvas.width !== width || canvas.height !== height) {
+    canvas.width = width;
+    canvas.height = height;
+  }
+
+  const mapRect = miniMap.getBoundingClientRect();
+  const mapWidth = Math.max(80, Math.round(mapRect.width * ratio));
+  const mapHeight = Math.max(48, Math.round(mapRect.height * ratio));
+  if (miniMap.width !== mapWidth || miniMap.height !== mapHeight) {
+    miniMap.width = mapWidth;
+    miniMap.height = mapHeight;
+  }
+  resizeQueued = false;
 }
 
 function updatePlayer(dt) {
@@ -346,17 +388,43 @@ function nearestEnemy(range) {
 function fireAt(target) {
   const angle = Math.atan2(target.y - state.player.y, target.x - state.player.x);
   const form = currentForm();
+  const beamLevel = state.player.effects.beam;
   state.projectiles.push({
     x: state.player.x,
     y: state.player.y,
     vx: Math.cos(angle) * 520,
     vy: Math.sin(angle) * 520,
-    life: 0.72,
-    damage: state.player.attack,
-    radius: 5 + state.upgradeCounts.area,
-    color: form.color
+    life: 0.72 + beamLevel * 0.12,
+    damage: state.player.attack * (1 + beamLevel * 0.08),
+    radius: 5 + state.upgradeCounts.area + beamLevel,
+    color: form.color,
+    pierce: beamLevel,
+    chain: state.player.effects.chain,
+    hitIds: new Set()
   });
   playTone(420 + state.player.level * 18, 0.04, "square", 0.018);
+}
+
+function fireDroneShot(droneIndex, target) {
+  const form = currentForm();
+  const count = Math.max(1, state.player.effects.drones);
+  const orbitAngle = state.elapsed * 2.6 + (droneIndex * Math.PI * 2) / count;
+  const originX = state.player.x + Math.cos(orbitAngle) * 52;
+  const originY = state.player.y + Math.sin(orbitAngle) * 52;
+  const angle = Math.atan2(target.y - originY, target.x - originX);
+  state.projectiles.push({
+    x: originX,
+    y: originY,
+    vx: Math.cos(angle) * 610,
+    vy: Math.sin(angle) * 610,
+    life: 0.62,
+    damage: state.player.attack * 0.52,
+    radius: 4,
+    color: form.color,
+    pierce: 0,
+    chain: Math.max(0, state.player.effects.chain - 1),
+    hitIds: new Set()
+  });
 }
 
 function updateEnemies(dt) {
@@ -368,7 +436,8 @@ function updateEnemies(dt) {
     enemy.y += Math.sin(angle) * enemy.speed * dt;
 
     if (Math.hypot(enemy.x - p.x, enemy.y - p.y) < enemy.radius + currentForm().radius) {
-      p.hp -= enemy.damage * dt;
+      const shieldReduce = Math.min(0.5, p.effects.shield * 0.1);
+      p.hp -= enemy.damage * (1 - shieldReduce) * dt;
       state.shake = Math.max(state.shake, 3);
       if (p.hp <= 0) {
         p.hp = 0;
@@ -379,6 +448,65 @@ function updateEnemies(dt) {
     if (enemy.hp <= 0) {
       killEnemy(enemy);
       state.enemies.splice(i, 1);
+    }
+  }
+}
+
+function updatePassiveEffects(dt) {
+  const p = state.player;
+  const effects = p.effects;
+  const form = currentForm();
+
+  if (effects.shield > 0) {
+    const radius = 46 + effects.shield * 18;
+    const damage = (5 + effects.shield * 4) * dt;
+    for (const enemy of state.enemies) {
+      if (Math.hypot(enemy.x - p.x, enemy.y - p.y) < radius + enemy.radius) {
+        enemy.hp -= damage;
+      }
+    }
+  }
+
+  if (effects.orbit > 0) {
+    const blades = Math.min(4, effects.orbit);
+    const radius = 76 + effects.orbit * 12;
+    for (let i = 0; i < blades; i += 1) {
+      const angle = state.elapsed * (2.2 + effects.orbit * 0.2) + (i * Math.PI * 2) / blades;
+      const bx = p.x + Math.cos(angle) * radius;
+      const by = p.y + Math.sin(angle) * radius;
+      for (const enemy of state.enemies) {
+        if (Math.hypot(enemy.x - bx, enemy.y - by) < enemy.radius + 18) {
+          enemy.hp -= (14 + effects.orbit * 5) * dt;
+        }
+      }
+    }
+  }
+
+  if (effects.drones > 0) {
+    p.droneCooldown -= dt;
+    if (p.droneCooldown <= 0) {
+      const count = Math.min(4, effects.drones);
+      for (let i = 0; i < count; i += 1) {
+        const target = nearestEnemy(240 + effects.drones * 42);
+        if (target) fireDroneShot(i, target);
+      }
+      p.droneCooldown = Math.max(0.34, 1.25 - effects.drones * 0.16);
+    }
+  }
+
+  if (effects.nova > 0) {
+    p.novaCooldown -= dt;
+    if (p.novaCooldown <= 0) {
+      const radius = 130 + effects.nova * 34;
+      for (const enemy of state.enemies) {
+        const dist = Math.hypot(enemy.x - p.x, enemy.y - p.y);
+        if (dist < radius) {
+          enemy.hp -= 18 + effects.nova * 14;
+        }
+      }
+      burst(p.x, p.y, form.color, 32 + effects.nova * 10);
+      playTone(160 + effects.nova * 55, 0.16, "sawtooth", 0.025);
+      p.novaCooldown = Math.max(2.4, 6.2 - effects.nova * 0.7);
     }
   }
 }
@@ -413,16 +541,34 @@ function updateProjectiles(dt) {
     shot.life -= dt;
     let hit = false;
     for (const enemy of state.enemies) {
+      if (shot.hitIds && shot.hitIds.has(enemy.id)) continue;
       if (Math.hypot(enemy.x - shot.x, enemy.y - shot.y) < enemy.radius + shot.radius) {
         enemy.hp -= shot.damage;
+        if (shot.hitIds) shot.hitIds.add(enemy.id);
+        if (shot.chain > 0) chainDamage(enemy, shot.chain, shot.damage * 0.42, shot.color);
         burst(shot.x, shot.y, shot.color, 4);
-        hit = true;
+        shot.pierce -= 1;
+        hit = shot.pierce < 0;
         break;
       }
     }
     if (hit || shot.life <= 0) {
       state.projectiles.splice(i, 1);
     }
+  }
+}
+
+function chainDamage(source, depth, damage, color) {
+  let jumps = Math.min(4, depth);
+  const candidates = state.enemies
+    .filter((enemy) => enemy.id !== source.id && Math.hypot(enemy.x - source.x, enemy.y - source.y) < 170)
+    .sort((a, b) => Math.hypot(a.x - source.x, a.y - source.y) - Math.hypot(b.x - source.x, b.y - source.y));
+
+  for (const enemy of candidates) {
+    if (jumps <= 0) break;
+    enemy.hp -= damage;
+    burst(enemy.x, enemy.y, color, 5);
+    jumps -= 1;
   }
 }
 
@@ -495,6 +641,12 @@ function applyUpgrade(upgrade) {
   }
   if (upgrade.id === "cooldown") p.cooldown *= 0.9;
   if (upgrade.id === "magnet") p.magnet *= 1.24;
+  if (upgrade.id === "shield") p.effects.shield += 1;
+  if (upgrade.id === "drones") p.effects.drones += 1;
+  if (upgrade.id === "beam") p.effects.beam += 1;
+  if (upgrade.id === "orbit") p.effects.orbit += 1;
+  if (upgrade.id === "chain") p.effects.chain += 1;
+  if (upgrade.id === "nova") p.effects.nova += 1;
   p.skills = summarizeSkills();
   ui.levelPanel.classList.add("hidden");
   pausedForChoice = false;
@@ -502,12 +654,24 @@ function applyUpgrade(upgrade) {
 }
 
 function summarizeSkills() {
-  return Object.entries(state.upgradeCounts)
+  const upgradeSkills = Object.entries(state.upgradeCounts)
     .filter(([, count]) => count > 0)
     .map(([id, count]) => {
       const upgrade = UPGRADES.find((item) => item.id === id);
       return { name: upgrade.name, count };
     });
+  const effectNames = {
+    shield: "Damage Shield",
+    drones: "Attack Drone",
+    beam: "Pierce Beam",
+    orbit: "Orbit Blade",
+    chain: "Chain Spark",
+    nova: "Data Nova"
+  };
+  const evolutionSkills = Object.entries(state.player.effects)
+    .filter(([id, count]) => count > 0 && state.upgradeCounts[id] === 0)
+    .map(([id, count]) => ({ name: effectNames[id], count }));
+  return [...upgradeSkills, ...evolutionSkills];
 }
 
 function tryEvolution(fromChoice = false) {
@@ -546,6 +710,7 @@ function evolveTo(formId) {
   state.player.hp = state.player.maxHp;
   state.player.attack *= 1.28;
   state.player.range *= 1.08;
+  applyEvolutionBonus(formId);
   state.discovered[formId] = true;
   saveCodex();
   ui.evoName.textContent = form.name;
@@ -560,6 +725,35 @@ function evolveTo(formId) {
     evolutionLock = false;
     burst(state.player.x, state.player.y, form.color, 70);
   }, 2600);
+}
+
+function applyEvolutionBonus(formId) {
+  const p = state.player;
+  const bonus = {
+    agumon: () => {
+      p.attack *= 1.12;
+      p.effects.beam += 1;
+    },
+    gabumon: () => {
+      p.speed *= 1.08;
+      p.effects.drones += 1;
+    },
+    devimon: () => {
+      p.effects.orbit += 1;
+      p.effects.chain += 1;
+    },
+    metalgreymon: () => {
+      p.effects.beam += 2;
+      p.effects.shield += 1;
+    },
+    machinedramon: () => {
+      p.effects.drones += 2;
+      p.effects.nova += 2;
+      p.effects.orbit += 1;
+    }
+  };
+  if (bonus[formId]) bonus[formId]();
+  p.skills = summarizeSkills();
 }
 
 function burst(x, y, color, count) {
@@ -578,6 +772,7 @@ function burst(x, y, color, count) {
 }
 
 function draw() {
+  if (resizeQueued) resizeCanvasToDisplay();
   const shakeX = state.shake ? rand(-state.shake, state.shake) : 0;
   const shakeY = state.shake ? rand(-state.shake, state.shake) : 0;
   ctx.save();
@@ -587,6 +782,7 @@ function draw() {
   drawPickups();
   drawProjectiles();
   drawEnemies();
+  drawPassiveEffects();
   drawPlayer();
   drawParticles();
   ctx.restore();
@@ -685,6 +881,65 @@ function drawPlayer() {
   ctx.textAlign = "center";
   ctx.fillText("???", 0, 3);
   ctx.restore();
+}
+
+function drawPassiveEffects() {
+  const p = state.player;
+  const pos = toScreen(p.x, p.y);
+  const form = currentForm();
+  const effects = p.effects;
+
+  if (effects.shield > 0) {
+    ctx.save();
+    ctx.translate(pos.x, pos.y);
+    ctx.strokeStyle = hexToRgba(form.color, 0.45);
+    ctx.lineWidth = 2;
+    ctx.shadowColor = form.color;
+    ctx.shadowBlur = 16;
+    ctx.beginPath();
+    ctx.arc(0, 0, 46 + effects.shield * 18, 0, Math.PI * 2);
+    ctx.stroke();
+    ctx.restore();
+  }
+
+  if (effects.orbit > 0) {
+    const blades = Math.min(4, effects.orbit);
+    const radius = 76 + effects.orbit * 12;
+    ctx.save();
+    ctx.strokeStyle = hexToRgba("#ff3e71", 0.5);
+    ctx.lineWidth = 2;
+    for (let i = 0; i < blades; i += 1) {
+      const angle = state.elapsed * (2.2 + effects.orbit * 0.2) + (i * Math.PI * 2) / blades;
+      const bx = pos.x + Math.cos(angle) * radius;
+      const by = pos.y + Math.sin(angle) * radius;
+      ctx.beginPath();
+      ctx.moveTo(pos.x, pos.y);
+      ctx.lineTo(bx, by);
+      ctx.stroke();
+      ctx.fillStyle = "#ff3e71";
+      polygon(bx, by, 11, 3, -angle);
+      ctx.fill();
+    }
+    ctx.restore();
+  }
+
+  if (effects.drones > 0) {
+    const count = Math.min(4, effects.drones);
+    ctx.save();
+    ctx.fillStyle = form.color;
+    ctx.strokeStyle = "#ffffff";
+    ctx.shadowColor = form.color;
+    ctx.shadowBlur = 12;
+    for (let i = 0; i < count; i += 1) {
+      const angle = state.elapsed * 2.6 + (i * Math.PI * 2) / count;
+      const x = pos.x + Math.cos(angle) * 52;
+      const y = pos.y + Math.sin(angle) * 52;
+      polygon(x, y, 8, 6, angle);
+      ctx.fill();
+      ctx.stroke();
+    }
+    ctx.restore();
+  }
 }
 
 function drawEnemies() {
@@ -909,6 +1164,12 @@ window.addEventListener("keydown", (event) => {
 });
 
 window.addEventListener("keyup", (event) => keys.delete(event.key.toLowerCase()));
+window.addEventListener("resize", () => {
+  resizeQueued = true;
+});
+window.addEventListener("orientationchange", () => {
+  resizeQueued = true;
+});
 window.addEventListener("pointerdown", startAudio, { once: true });
 window.addEventListener("keydown", startAudio, { once: true });
 
