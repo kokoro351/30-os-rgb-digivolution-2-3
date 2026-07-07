@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>DIGIVICE SURVIVOR</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <main class="shell">
+      <section class="digivice" aria-label="DIGIVICE SURVIVOR game">
+        <div class="device-top">
+          <div class="brand">DIGIVICE SURVIVOR</div>
+          <button id="codexButton" class="codex-button" type="button">CODEX</button>
+        </div>
+
+        <div class="screen-wrap">
+          <canvas id="gameCanvas" width="960" height="540"></canvas>
+          <div class="scanlines"></div>
+          <div class="screen-noise"></div>
+          <div class="hud top-left">
+            <div class="hud-row"><span>HP</span><strong id="hpText">100 / 100</strong></div>
+            <div class="meter"><i id="hpFill"></i></div>
+            <div class="hud-row"><span>LV</span><strong id="levelText">1</strong></div>
+            <div class="hud-row"><span>FORM</span><strong id="formText">Botamon</strong></div>
+            <div class="hud-row"><span>TYPE</span><strong id="typeText">Free</strong></div>
+          </div>
+
+          <div class="hud top-right">
+            <canvas id="miniMap" width="132" height="92"></canvas>
+            <div class="stage-name" id="stageText">Data Shore</div>
+            <div class="timer" id="timerText">00:00</div>
+          </div>
+
+          <div class="hud bottom-left">
+            <div class="hud-title">EVOLUTION</div>
+            <div class="evo-ring"><span id="evoGaugeText">0%</span></div>
+            <div class="data-grid" id="dataGrid"></div>
+          </div>
+
+          <div class="hud bottom-right">
+            <div class="hud-title">SKILLS</div>
+            <ul id="skillList" class="skill-list"></ul>
+          </div>
+
+          <div class="exp-bar"><i id="expFill"></i></div>
+
+          <div id="levelPanel" class="modal hidden">
+            <div class="modal-card">
+              <div class="modal-kicker">DIGIVICE / ABILITY SELECT</div>
+              <h2>能力データを選択</h2>
+              <div id="upgradeChoices" class="upgrade-choices"></div>
+            </div>
+          </div>
+
+          <div id="evolutionOverlay" class="evolution hidden">
+            <div class="hex-field"></div>
+            <div class="evo-core"></div>
+            <div class="evo-title">DIGIVOLUTION</div>
+            <div id="evoName" class="evo-name">AGUMON</div>
+          </div>
+
+          <div id="codexPanel" class="codex hidden">
+            <div class="codex-card">
+              <button id="closeCodex" type="button" aria-label="閉じる">×</button>
+              <div class="modal-kicker">DIGIVICE / FIELD GUIDE</div>
+              <h2>図鑑</h2>
+              <div id="codexEntries" class="codex-entries"></div>
+            </div>
+          </div>
+
+          <div id="gameOverPanel" class="modal hidden">
+            <div class="modal-card">
+              <div class="modal-kicker">CONNECTION LOST</div>
+              <h2 id="resultTitle">GAME OVER</h2>
+              <p id="resultText"></p>
+              <button id="restartButton" class="primary-button" type="button">再接続</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="device-bottom">
+          <div class="speaker"></div>
+          <div class="control-note">WASD / Arrow: move　Space: pause　Codex: discovered evolutions</div>
+          <div class="speaker"></div>
+        </div>
+      </section>
+    </main>
+    <script src="game.js"></script>
+  </body>
+</html>
