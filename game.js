@@ -28,7 +28,11 @@ const ui = {
   gameOverPanel: document.getElementById("gameOverPanel"),
   resultTitle: document.getElementById("resultTitle"),
   resultText: document.getElementById("resultText"),
-  restartButton: document.getElementById("restartButton")
+  restartButton: document.getElementById("restartButton"),
+  touchStick: document.getElementById("touchStick"),
+  touchKnob: document.getElementById("touchKnob"),
+  touchPause: document.getElementById("touchPause"),
+  touchCodex: document.getElementById("touchCodex")
 };
 
 const DATA_TYPES = ["Vaccine", "Data", "Virus", "Free"];
@@ -131,6 +135,7 @@ const ENEMY_ARCHETYPES = {
 };
 
 const keys = new Set();
+const touchMove = { x: 0, y: 0, activeId: null };
 let lastTime = performance.now();
 let pausedForChoice = false;
 let evolutionLock = false;
@@ -309,6 +314,8 @@ function updatePlayer(dt) {
   if (keys.has("arrowright") || keys.has("d")) dx += 1;
   if (keys.has("arrowup") || keys.has("w")) dy -= 1;
   if (keys.has("arrowdown") || keys.has("s")) dy += 1;
+  dx += touchMove.x;
+  dy += touchMove.y;
   const len = Math.hypot(dx, dy) || 1;
   p.x = clamp(p.x + (dx / len) * p.speed * dt, 30, state.worldSize - 30);
   p.y = clamp(p.y + (dy / len) * p.speed * dt, 30, state.worldSize - 30);
@@ -861,11 +868,43 @@ function hexToRgba(hex, alpha) {
   return `rgba(${r}, ${g}, ${b}, ${alpha})`;
 }
 
+function setTouchMoveFromPointer(event) {
+  const rect = ui.touchStick.getBoundingClientRect();
+  const centerX = rect.left + rect.width / 2;
+  const centerY = rect.top + rect.height / 2;
+  const max = rect.width * 0.38;
+  const rawX = event.clientX - centerX;
+  const rawY = event.clientY - centerY;
+  const dist = Math.hypot(rawX, rawY);
+  const scale = dist > max ? max / dist : 1;
+  const knobX = rawX * scale;
+  const knobY = rawY * scale;
+  touchMove.x = clamp(rawX / max, -1, 1);
+  touchMove.y = clamp(rawY / max, -1, 1);
+  if (dist > max) {
+    const len = Math.hypot(touchMove.x, touchMove.y) || 1;
+    touchMove.x /= len;
+    touchMove.y /= len;
+  }
+  ui.touchKnob.style.transform = `translate(calc(-50% + ${knobX}px), calc(-50% + ${knobY}px))`;
+}
+
+function resetTouchMove() {
+  touchMove.x = 0;
+  touchMove.y = 0;
+  touchMove.activeId = null;
+  ui.touchKnob.style.transform = "translate(-50%, -50%)";
+}
+
+function togglePause() {
+  pausedForChoice = !pausedForChoice;
+  ui.levelPanel.classList.add("hidden");
+}
+
 window.addEventListener("keydown", (event) => {
   keys.add(event.key.toLowerCase());
   if (event.code === "Space") {
-    pausedForChoice = !pausedForChoice;
-    ui.levelPanel.classList.add("hidden");
+    togglePause();
   }
 });
 
@@ -876,6 +915,26 @@ window.addEventListener("keydown", startAudio, { once: true });
 ui.codexButton.addEventListener("click", showCodex);
 ui.closeCodex.addEventListener("click", () => ui.codexPanel.classList.add("hidden"));
 ui.restartButton.addEventListener("click", resetGame);
+ui.touchPause.addEventListener("click", togglePause);
+ui.touchCodex.addEventListener("click", showCodex);
+ui.touchStick.addEventListener("pointerdown", (event) => {
+  event.preventDefault();
+  startAudio();
+  touchMove.activeId = event.pointerId;
+  ui.touchStick.setPointerCapture(event.pointerId);
+  setTouchMoveFromPointer(event);
+});
+ui.touchStick.addEventListener("pointermove", (event) => {
+  if (touchMove.activeId !== event.pointerId) return;
+  event.preventDefault();
+  setTouchMoveFromPointer(event);
+});
+ui.touchStick.addEventListener("pointerup", (event) => {
+  if (touchMove.activeId === event.pointerId) resetTouchMove();
+});
+ui.touchStick.addEventListener("pointercancel", (event) => {
+  if (touchMove.activeId === event.pointerId) resetTouchMove();
+});
 
 preloadSpriteImages();
 

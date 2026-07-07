@@ -21,6 +21,7 @@ body {
   min-height: 100%;
   margin: 0;
   overflow: hidden;
+  touch-action: none;
   background:
     radial-gradient(circle at 50% 30%, rgba(36, 91, 112, 0.28), transparent 36rem),
     linear-gradient(135deg, #01040a, #071520 48%, #02050b);
@@ -250,6 +251,84 @@ button {
   padding: 4px 0;
 }
 
+.touch-controls {
+  position: absolute;
+  inset: auto 16px 28px 16px;
+  z-index: 12;
+  display: none;
+  align-items: flex-end;
+  justify-content: space-between;
+  pointer-events: none;
+}
+
+.touch-stick {
+  position: relative;
+  width: 118px;
+  height: 118px;
+  border: 1px solid rgba(79, 246, 255, 0.42);
+  border-radius: 50%;
+  background:
+    radial-gradient(circle, rgba(79, 246, 255, 0.18), transparent 58%),
+    rgba(3, 16, 26, 0.5);
+  box-shadow: inset 0 0 18px rgba(79, 246, 255, 0.16), 0 0 22px rgba(79, 246, 255, 0.14);
+  pointer-events: auto;
+  touch-action: none;
+}
+
+.touch-stick::before,
+.touch-stick::after {
+  content: "";
+  position: absolute;
+  background: rgba(79, 246, 255, 0.26);
+}
+
+.touch-stick::before {
+  top: 50%;
+  right: 18px;
+  left: 18px;
+  height: 1px;
+}
+
+.touch-stick::after {
+  top: 18px;
+  bottom: 18px;
+  left: 50%;
+  width: 1px;
+}
+
+.touch-knob {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 46px;
+  height: 46px;
+  border: 1px solid rgba(255, 255, 255, 0.72);
+  border-radius: 50%;
+  background: rgba(79, 246, 255, 0.62);
+  box-shadow: 0 0 20px rgba(79, 246, 255, 0.72);
+  transform: translate(-50%, -50%);
+}
+
+.touch-actions {
+  display: grid;
+  gap: 10px;
+  pointer-events: auto;
+}
+
+.touch-action {
+  min-width: 84px;
+  min-height: 44px;
+  border: 1px solid rgba(79, 246, 255, 0.42);
+  border-radius: 999px;
+  background: rgba(3, 16, 26, 0.74);
+  color: var(--cyan);
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  box-shadow: inset 0 0 14px rgba(79, 246, 255, 0.12);
+  touch-action: manipulation;
+}
+
 .modal,
 .codex,
 .evolution {
@@ -477,15 +556,54 @@ button {
 
   .bottom-left,
   .bottom-right {
-    bottom: 16px;
+    bottom: 150px;
   }
 
   .upgrade-choices {
     grid-template-columns: 1fr;
   }
 
+  .touch-controls {
+    display: flex;
+  }
+
   .control-note {
     display: none;
+  }
+}
+
+@media (pointer: coarse) {
+  .touch-controls {
+    display: flex;
+  }
+}
+
+@media (max-width: 520px) {
+  .top-left {
+    width: 158px;
+  }
+
+  .top-right {
+    width: 122px;
+  }
+
+  #miniMap {
+    width: 100px;
+    height: 70px;
+  }
+
+  .bottom-left,
+  .bottom-right {
+    width: 144px;
+  }
+
+  .data-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .touch-stick {
+    width: 104px;
+    height: 104px;
   }
 }
 
