@@ -1,12 +1,23 @@
-# Sprite assets
+﻿# Sprite assets
 
-Place character portraits here using the form id as the file name.
+Each monster can have multiple frames. The game reads the paths from the `MONSTERS` data in `game.js`.
 
-- botamon.png
-- agumon.png
-- gabumon.png
-- devimon.png
-- metalgreymon.png
-- machinedramon.png
+Current naming rule:
 
-If a file is missing, the game uses the built-in wireframe / silhouette placeholder.
+```text
+assets/sprites/<monster-id>_01.png
+assets/sprites/<monster-id>_02.png
+```
+
+Examples:
+
+```text
+assets/sprites/botamon_01.png
+assets/sprites/botamon_02.png
+assets/sprites/agumon_01.png
+assets/sprites/agumon_02.png
+```
+
+If an image is missing, the game falls back to an attribute-colored placeholder and keeps running.
+
+Legacy single-frame files such as `agumon.png` may remain in the folder, but the current runtime uses the `_01` / `_02` frame files.

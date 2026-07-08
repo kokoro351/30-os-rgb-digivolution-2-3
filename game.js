@@ -44,68 +44,64 @@ const STAGES = [
   { name: "Deep Digital World", color: "#ff3e71", enemyBias: ["Virus", "Vaccine"] }
 ];
 
-const FORMS = [
-  {
-    id: "botamon",
-    name: "Botamon",
-    stage: "Fresh",
-    type: "Free",
-    desc: "黒い幼年期データ。未知の進化分岐を多く持つ。",
-    condition: "初期登録",
-    color: "#7cffe9",
-    radius: 17
-  },
-  {
-    id: "agumon",
-    name: "Agumon",
-    stage: "Rookie",
-    type: "Vaccine",
-    desc: "攻撃データを多く吸収した小型恐竜型。",
-    condition: "Vaccine 18 / Power 2",
-    color: "#ffb340",
-    radius: 22
-  },
-  {
-    id: "gabumon",
-    name: "Gabumon",
-    stage: "Rookie",
-    type: "Data",
-    desc: "速度と回避ログが高い獣型データ。",
-    condition: "Data 18 / Speed 2",
-    color: "#65d9ff",
-    radius: 22
-  },
-  {
-    id: "devimon",
-    name: "Devimon",
-    stage: "Champion",
-    type: "Virus",
-    desc: "ウイルス片を抱え込み、範囲攻撃へ特化した成熟期。",
-    condition: "Virus 26 / Area 2",
-    color: "#b178ff",
-    radius: 27
-  },
-  {
-    id: "metalgreymon",
-    name: "MetalGreymon",
-    stage: "Ultimate",
-    type: "Vaccine",
-    desc: "ボスデータを解析し、機械化装甲を得た完全体。",
-    condition: "Vaccine 42 / Boss 1 / Power 3",
-    color: "#ff6a3d",
-    radius: 32
-  },
-  {
-    id: "machinedramon",
-    name: "Machinedramon",
-    stage: "Mega",
-    type: "Virus",
-    desc: "深層サーバーの破損コードを制御する究極体。",
-    condition: "Virus 54 / Boss 2 / Area 3",
-    color: "#ff3e71",
-    radius: 38
-  }
+const MONSTERS = [
+  monster("botamon", "Botamon", "Fresh", "Free", "player_candidate", 90, 1.0, 8, 3, ["koromon", "tsunomon"], null, "#7cffe9", 17),
+  monster("koromon", "Koromon", "In-Training", "Free", "player_candidate", 100, 1.02, 9, 4, ["agumon", "patamon"], "Botamon route", "#ff9fc8", 18),
+  monster("tsunomon", "Tsunomon", "In-Training", "Data", "player_candidate", 105, 1.08, 9, 4, ["gabumon"], "Botamon + Data route", "#d8d6c8", 18),
+  monster("agumon", "Agumon", "Rookie", "Vaccine", "player_candidate", 120, 1.1, 12, 5, ["greymon", "devimon"], "Koromon route", "#ffb340", 22),
+  monster("gabumon", "Gabumon", "Rookie", "Data", "player_candidate", 112, 1.2, 11, 5, ["garurumon"], "Tsunomon route", "#65d9ff", 22),
+  monster("patamon", "Patamon", "Rookie", "Free", "enemy", 95, 1.18, 9, 5, ["angemon"], "Free data route", "#ffe66b", 20),
+  monster("tentomon", "Tentomon", "Rookie", "Vaccine", "enemy", 112, 0.95, 10, 5, ["kuwagamon"], "Vaccine data route", "#75ff9e", 21),
+  monster("palmon", "Palmon", "Rookie", "Data", "enemy", 102, 1.0, 9, 5, ["kuwagamon"], "Data forest route", "#9dff70", 20),
+  monster("gomamon", "Gomamon", "Rookie", "Free", "enemy", 108, 1.08, 10, 5, ["garurumon"], "Free sea route", "#e7f7ff", 20),
+  monster("biyomon", "Biyomon", "Rookie", "Data", "enemy", 98, 1.25, 9, 5, ["birdramon"], "Data sky route", "#ff8fcf", 20),
+  monster("greymon", "Greymon", "Champion", "Vaccine", "player_candidate", 210, 0.92, 20, 9, ["metalgreymon", "skullgreymon"], "Agumon + power", "#ff6a3d", 30),
+  monster("garurumon", "Garurumon", "Champion", "Data", "player_candidate", 180, 1.35, 17, 9, ["weregarurumon"], "Gabumon route", "#70c7ff", 29),
+  monster("devimon", "Devimon", "Champion", "Virus", "player_candidate", 190, 1.08, 19, 10, ["skullgreymon"], "Virus / area route", "#b178ff", 29),
+  monster("angemon", "Angemon", "Champion", "Vaccine", "enemy", 185, 1.08, 18, 10, ["andromon"], "Patamon route", "#fff0a8", 29),
+  monster("kuwagamon", "Kuwagamon", "Champion", "Virus", "enemy", 205, 1.0, 21, 10, ["andromon"], "Insect route", "#76ff72", 30),
+  monster("birdramon", "Birdramon", "Champion", "Data", "enemy", 175, 1.28, 18, 10, ["metalgreymon"], "Biyomon route", "#ff7048", 29),
+  monster("metalgreymon", "MetalGreymon", "Ultimate", "Vaccine", "player_candidate", 330, 0.88, 34, 16, ["wargreymon"], "Greymon + boss data", "#ff6a3d", 36),
+  monster("weregarurumon", "WereGarurumon", "Ultimate", "Data", "player_candidate", 285, 1.42, 30, 16, ["metalgarurumon"], "Garurumon route", "#8ed8ff", 35),
+  monster("skullgreymon", "SkullGreymon", "Ultimate", "Virus", "player_candidate", 350, 0.82, 38, 18, ["machinedramon"], "Dark Greymon route", "#d8d8d8", 36),
+  monster("andromon", "Andromon", "Ultimate", "Vaccine", "enemy", 310, 0.9, 32, 17, ["machinedramon"], "Machine data route", "#bfc8d4", 35),
+  monster("wargreymon", "WarGreymon", "Mega", "Vaccine", "player_candidate", 460, 1.08, 48, 28, [], "MetalGreymon route", "#ffd45c", 42),
+  monster("metalgarurumon", "MetalGarurumon", "Mega", "Data", "player_candidate", 420, 1.35, 44, 28, [], "WereGarurumon route", "#8ee8ff", 41),
+  monster("machinedramon", "Machinedramon", "Mega", "Virus", "player_candidate", 500, 0.78, 54, 32, [], "Virus machine route", "#ff3e71", 42)
 ];
+
+function monster(id, name, stage, attribute, role, hp, speed, attack, exp, evolutionTo, unlockCondition, color, radius) {
+  return {
+    id,
+    name,
+    stage,
+    attribute,
+    type: attribute,
+    role,
+    hp,
+    speed,
+    attack,
+    exp,
+    sprites: [`assets/sprites/${id}_01.png`, `assets/sprites/${id}_02.png`],
+    evolutionTo,
+    evolutionFrom: [],
+    unlockCondition,
+    desc: `${stage} / ${attribute} attribute digital monster.`,
+    condition: unlockCondition || "???",
+    color,
+    radius
+  };
+}
+
+for (const source of MONSTERS) {
+  for (const targetId of source.evolutionTo) {
+    const target = MONSTERS.find((candidate) => candidate.id === targetId);
+    if (target) target.evolutionFrom.push(source.id);
+  }
+}
+
+const MONSTER_BY_ID = Object.fromEntries(MONSTERS.map((monsterData) => [monsterData.id, monsterData]));
+const FORMS = MONSTERS;
 
 const UPGRADES = [
   { id: "power", name: "Attack Kernel", desc: "攻撃力 +18%。Vaccine 進化へ寄る。", type: "Vaccine" },
@@ -122,14 +118,17 @@ const UPGRADES = [
   { id: "nova", name: "Data Nova", desc: "一定間隔で周囲にデータ爆発を発生。", type: "Free" }
 ];
 
-const SPRITES = Object.fromEntries(FORMS.map((form) => [form.id, `assets/sprites/${form.id}.png`]));
+const SPRITES = Object.fromEntries(MONSTERS.map((monsterData) => [monsterData.id, monsterData.sprites]));
 const spriteImages = new Map();
 
 function preloadSpriteImages() {
-  for (const [id, src] of Object.entries(SPRITES)) {
-    const image = new Image();
-    image.src = src;
-    spriteImages.set(id, image);
+  for (const sprites of Object.values(SPRITES)) {
+    for (const src of sprites) {
+      if (spriteImages.has(src)) continue;
+      const image = new Image();
+      image.src = src;
+      spriteImages.set(src, image);
+    }
   }
 }
 
@@ -139,6 +138,15 @@ const ENEMY_ARCHETYPES = {
   Virus: { color: "#ff3e71", hp: 22, speed: 44, xp: 7 },
   Free: { color: "#ffe66b", hp: 12, speed: 58, xp: 4 }
 };
+
+const ENEMY_SPAWN_TABLE = [
+  { until: 180, ids: ["botamon", "koromon", "tsunomon"] },
+  { until: 480, ids: ["agumon", "gabumon", "tentomon", "patamon", "palmon", "gomamon", "biyomon"] },
+  { until: 900, ids: ["greymon", "garurumon", "devimon", "angemon", "kuwagamon", "birdramon"] },
+  { until: Infinity, ids: ["metalgreymon", "skullgreymon", "andromon", "machinedramon", "weregarurumon"] }
+];
+
+const BOSS_POOL = ["greymon", "garurumon", "devimon", "metalgreymon", "skullgreymon", "machinedramon"];
 
 const keys = new Set();
 const touchMove = { x: 0, y: 0, activeId: null };
@@ -231,7 +239,7 @@ function saveCodex() {
 }
 
 function currentForm() {
-  return FORMS.find((form) => form.id === state.player.formId) || FORMS[0];
+  return MONSTER_BY_ID[state.player.formId] || MONSTER_BY_ID.botamon;
 }
 
 function currentStage() {
@@ -261,35 +269,46 @@ function startAudio() {
 }
 
 function spawnEnemy(forceBoss = false) {
-  const stage = currentStage();
   const angle = Math.random() * Math.PI * 2;
   const distance = 520 + Math.random() * 260;
-  const type = forceBoss ? stage.enemyBias[1] : stage.enemyBias[Math.floor(Math.random() * stage.enemyBias.length)];
-  const base = ENEMY_ARCHETYPES[type];
+  const monsterData = pickEnemyMonster(forceBoss);
+  const type = monsterData.attribute;
+  const base = ENEMY_ARCHETYPES[type] || ENEMY_ARCHETYPES.Free;
   const scale = 1 + state.elapsed / 240;
   const bossScale = forceBoss ? 8 + state.bossesDefeated * 2.5 : 1;
   const x = clamp(state.player.x + Math.cos(angle) * distance, 60, state.worldSize - 60);
   const y = clamp(state.player.y + Math.sin(angle) * distance, 60, state.worldSize - 60);
+  const enemyHp = Math.max(base.hp, monsterData.hp * 0.18) * scale * bossScale;
 
   state.enemies.push({
     id: nextEnemyId++,
+    monsterId: monsterData.id,
+    name: monsterData.name,
     x,
     y,
     type,
     boss: forceBoss,
-    hp: base.hp * scale * bossScale,
-    maxHp: base.hp * scale * bossScale,
-    speed: base.speed * (forceBoss ? 0.66 : 1),
-    xp: Math.round(base.xp * scale * (forceBoss ? 10 : 1)),
-    radius: forceBoss ? 34 : 15 + Math.random() * 5,
-    color: base.color,
-    damage: forceBoss ? 24 : 8
+    hp: enemyHp,
+    maxHp: enemyHp,
+    speed: base.speed * monsterData.speed * (forceBoss ? 0.6 : 1),
+    xp: Math.round(monsterData.exp * scale * (forceBoss ? 10 : 1)),
+    radius: forceBoss ? monsterData.radius * 1.2 : monsterData.radius * 0.65,
+    color: monsterData.color || base.color,
+    damage: forceBoss ? monsterData.attack * 1.4 : monsterData.attack * 0.45
   });
 
   if (forceBoss) {
     playTone(120, 0.45, "sawtooth", 0.05);
     state.shake = 18;
   }
+}
+
+function pickEnemyMonster(forceBoss) {
+  const pool = forceBoss
+    ? BOSS_POOL
+    : (ENEMY_SPAWN_TABLE.find((entry) => state.elapsed < entry.until) || ENEMY_SPAWN_TABLE[0]).ids;
+  const id = pool[Math.floor(Math.random() * pool.length)];
+  return MONSTER_BY_ID[id] || MONSTER_BY_ID.botamon;
 }
 
 function update(dt) {
@@ -514,6 +533,10 @@ function updatePassiveEffects(dt) {
 function killEnemy(enemy) {
   state.player.xp += enemy.xp;
   state.data[enemy.type] += enemy.boss ? 8 : 1;
+  if (enemy.monsterId) {
+    state.discovered[enemy.monsterId] = true;
+    saveCodex();
+  }
   if (enemy.boss) {
     state.bossesDefeated += 1;
   }
@@ -677,29 +700,55 @@ function summarizeSkills() {
 function tryEvolution(fromChoice = false) {
   if (evolutionLock) return;
   const p = state.player;
-  const d = state.data;
-  const u = state.upgradeCounts;
-  let next = null;
-
-  if (p.formId === "botamon" && p.level >= 3) {
-    if (d.Vaccine >= 18 || u.power >= 2) next = "agumon";
-    else if (d.Data >= 18 || u.speed >= 2 || u.cooldown >= 2) next = "gabumon";
-  }
-
-  if ((p.formId === "agumon" || p.formId === "gabumon") && p.level >= 7) {
-    if (d.Virus >= 26 || u.area >= 2) next = "devimon";
-    if (p.formId === "agumon" && d.Vaccine >= 42 && u.power >= 3 && state.bossesDefeated >= 1) next = "metalgreymon";
-  }
-
-  if ((p.formId === "devimon" || p.formId === "metalgreymon") && p.level >= 12) {
-    if (d.Virus >= 54 && u.area >= 3 && state.bossesDefeated >= 2) next = "machinedramon";
-  }
+  const form = currentForm();
+  const next = pickEvolutionCandidate(form);
 
   if (next && next !== p.formId) {
     evolveTo(next);
   } else if (fromChoice) {
     state.shake = 5;
   }
+}
+
+function pickEvolutionCandidate(form) {
+  if (!form.evolutionTo.length) return null;
+  const p = state.player;
+  const d = state.data;
+  const u = state.upgradeCounts;
+  const requiredLevel = { Fresh: 2, "In-Training": 3, Rookie: 6, Champion: 10, Ultimate: 14, Mega: 99 }[form.stage] || 4;
+  if (p.level < requiredLevel) return null;
+
+  const route = {
+    botamon: () => (d.Data >= 8 || u.speed >= 1 || u.cooldown >= 1 ? "tsunomon" : "koromon"),
+    koromon: () => {
+      if (d.Free >= 16 || u.magnet >= 2) return "patamon";
+      return "agumon";
+    },
+    tsunomon: () => "gabumon",
+    agumon: () => {
+      if (d.Virus >= 24 || u.area >= 2 || u.orbit >= 1) return "devimon";
+      return "greymon";
+    },
+    gabumon: () => "garurumon",
+    patamon: () => "angemon",
+    tentomon: () => "kuwagamon",
+    palmon: () => "kuwagamon",
+    gomamon: () => "garurumon",
+    biyomon: () => "birdramon",
+    greymon: () => (d.Virus >= 36 || u.chain >= 2 ? "skullgreymon" : "metalgreymon"),
+    garurumon: () => "weregarurumon",
+    devimon: () => "skullgreymon",
+    angemon: () => "andromon",
+    kuwagamon: () => "andromon",
+    birdramon: () => "metalgreymon",
+    metalgreymon: () => "wargreymon",
+    weregarurumon: () => "metalgarurumon",
+    skullgreymon: () => "machinedramon",
+    andromon: () => "machinedramon"
+  };
+
+  const picked = route[form.id] ? route[form.id]() : form.evolutionTo[0];
+  return form.evolutionTo.includes(picked) ? picked : form.evolutionTo[0];
 }
 
 function evolveTo(formId) {
@@ -730,6 +779,14 @@ function evolveTo(formId) {
 function applyEvolutionBonus(formId) {
   const p = state.player;
   const bonus = {
+    koromon: () => {
+      p.maxHp += 8;
+      p.hp = Math.min(p.maxHp, p.hp + 20);
+    },
+    tsunomon: () => {
+      p.speed *= 1.06;
+      p.effects.drones += 1;
+    },
     agumon: () => {
       p.attack *= 1.12;
       p.effects.beam += 1;
@@ -742,9 +799,48 @@ function applyEvolutionBonus(formId) {
       p.effects.orbit += 1;
       p.effects.chain += 1;
     },
+    greymon: () => {
+      p.attack *= 1.18;
+      p.effects.beam += 1;
+    },
+    garurumon: () => {
+      p.speed *= 1.12;
+      p.effects.drones += 1;
+    },
+    angemon: () => {
+      p.effects.shield += 2;
+      p.effects.nova += 1;
+    },
+    kuwagamon: () => {
+      p.effects.orbit += 2;
+    },
+    birdramon: () => {
+      p.effects.nova += 1;
+      p.effects.beam += 1;
+    },
     metalgreymon: () => {
       p.effects.beam += 2;
       p.effects.shield += 1;
+    },
+    weregarurumon: () => {
+      p.effects.drones += 2;
+      p.speed *= 1.12;
+    },
+    skullgreymon: () => {
+      p.effects.chain += 2;
+      p.effects.orbit += 1;
+    },
+    andromon: () => {
+      p.effects.shield += 1;
+      p.effects.drones += 1;
+    },
+    wargreymon: () => {
+      p.effects.beam += 3;
+      p.effects.nova += 1;
+    },
+    metalgarurumon: () => {
+      p.effects.drones += 3;
+      p.effects.chain += 1;
     },
     machinedramon: () => {
       p.effects.drones += 2;
@@ -802,6 +898,35 @@ function toScreen(x, y) {
   return { x: x - cam.x, y: y - cam.y };
 }
 
+function getAnimatedSprite(monsterData, frameMs = 320) {
+  const sprites = monsterData?.sprites || [];
+  if (!sprites.length) return null;
+  const index = sprites.length > 1 ? Math.floor((state.elapsed * 1000) / frameMs) % sprites.length : 0;
+  const image = spriteImages.get(sprites[index]);
+  return image && image.complete && image.naturalWidth > 0 ? image : null;
+}
+
+function drawMonsterSprite(monsterData, x, y, size, label = "???") {
+  const image = getAnimatedSprite(monsterData);
+  if (image) {
+    ctx.drawImage(image, x - size / 2, y - size / 2, size, size);
+    return true;
+  }
+
+  ctx.fillStyle = monsterData?.color || "#4ff6ff";
+  ctx.beginPath();
+  ctx.arc(x, y, size * 0.28, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.strokeStyle = "#ffffff";
+  ctx.lineWidth = 2;
+  ctx.stroke();
+  ctx.fillStyle = "#001018";
+  ctx.font = "bold 12px Segoe UI";
+  ctx.textAlign = "center";
+  ctx.fillText(label.slice(0, 3).toUpperCase(), x, y + 4);
+  return false;
+}
+
 function drawBackground() {
   const cam = camera();
   const stage = currentStage();
@@ -846,40 +971,15 @@ function drawPlayer() {
   const p = state.player;
   const form = currentForm();
   const pos = toScreen(p.x, p.y);
-  const sprite = spriteImages.get(form.id);
   ctx.save();
   ctx.translate(pos.x, pos.y);
   ctx.shadowColor = form.color;
   ctx.shadowBlur = 18;
 
-  if (sprite && sprite.complete && sprite.naturalWidth > 0) {
-    const size = form.radius * 5;
-    ctx.drawImage(sprite, -size / 2, -size / 2, size, size);
+  if (drawMonsterSprite(form, 0, 0, form.radius * 5, form.name)) {
     ctx.restore();
     return;
   }
-
-  ctx.fillStyle = form.color;
-  ctx.beginPath();
-  for (let i = 0; i < 6; i += 1) {
-    const angle = Math.PI / 6 + (i * Math.PI) / 3;
-    const r = form.radius + (i % 2) * 4;
-    const x = Math.cos(angle) * r;
-    const y = Math.sin(angle) * r;
-    if (i === 0) ctx.moveTo(x, y);
-    else ctx.lineTo(x, y);
-  }
-  ctx.closePath();
-  ctx.fill();
-
-  ctx.shadowBlur = 0;
-  ctx.strokeStyle = "#ffffff";
-  ctx.lineWidth = 2;
-  ctx.stroke();
-  ctx.fillStyle = "#001018";
-  ctx.font = "bold 10px Segoe UI";
-  ctx.textAlign = "center";
-  ctx.fillText("???", 0, 3);
   ctx.restore();
 }
 
@@ -945,15 +1045,12 @@ function drawPassiveEffects() {
 function drawEnemies() {
   for (const enemy of state.enemies) {
     const pos = toScreen(enemy.x, enemy.y);
+    const monsterData = MONSTER_BY_ID[enemy.monsterId] || MONSTER_BY_ID.botamon;
     ctx.save();
     ctx.translate(pos.x, pos.y);
     ctx.shadowColor = enemy.color;
     ctx.shadowBlur = enemy.boss ? 22 : 10;
-    ctx.strokeStyle = enemy.color;
-    ctx.fillStyle = hexToRgba(enemy.color, enemy.boss ? 0.28 : 0.54);
-    polygon(0, 0, enemy.radius, enemy.boss ? 8 : 4, state.elapsed * (enemy.boss ? 0.8 : 1.7));
-    ctx.fill();
-    ctx.stroke();
+    drawMonsterSprite(monsterData, 0, 0, enemy.radius * (enemy.boss ? 4.1 : 3.7), enemy.name || monsterData.name);
     ctx.shadowBlur = 0;
     ctx.fillStyle = "#fff";
     ctx.fillRect(-enemy.radius, -enemy.radius - 8, enemy.radius * 2 * (enemy.hp / enemy.maxHp), 3);
@@ -1061,21 +1158,33 @@ function evoReadiness() {
 function showCodex() {
   ui.codexEntries.innerHTML = FORMS.map((form) => {
     const found = state.discovered[form.id];
-    const portrait = found
-      ? `<img src="${SPRITES[form.id]}" alt="${form.name}" onerror="this.replaceWith(document.createTextNode('画像準備中 / silhouette'))">`
-      : "？？？";
+    const portrait = found ? spritePreviewHtml(form) : "???";
+    const from = form.evolutionFrom.length ? form.evolutionFrom.map((id) => MONSTER_BY_ID[id]?.name || id).join(" / ") : "-";
+    const to = form.evolutionTo.length ? form.evolutionTo.map((id) => MONSTER_BY_ID[id]?.name || id).join(" / ") : "-";
     return `
       <article class="entry ${found ? "" : "locked"}">
         <div class="portrait" style="border-color:${found ? form.color : "rgba(255,255,255,.2)"}">
           ${portrait}
         </div>
-        <strong>${found ? form.name : "未発見"}</strong>
-        <p>${found ? form.desc : "この進化ルートはまだ解析されていない。"}</p>
-        <small>条件: ${found ? form.condition : "？？？"}</small>
+        <strong>${found ? form.name : "Undiscovered"}</strong>
+        <p>${found ? `${form.stage} / ${form.attribute}` : "Evolution data is still encrypted."}</p>
+        <small>FROM: ${found ? from : "???"}</small>
+        <small>TO: ${found ? to : "???"}</small>
+        <small>UNLOCK: ${found ? form.condition : "???"}</small>
       </article>
     `;
   }).join("");
   ui.codexPanel.classList.remove("hidden");
+}
+
+function spritePreviewHtml(form) {
+  const sprites = form.sprites && form.sprites.length ? form.sprites : [];
+  if (!sprites.length) return "画像準備中 / silhouette";
+  return `
+    <span class="anim-preview">
+      ${sprites.map((src, index) => `<img class="anim-frame frame-${index}" src="${src}" alt="${form.name} frame ${index + 1}" onerror="this.classList.add('missing')">`).join("")}
+    </span>
+  `;
 }
 
 function endGame(cleared) {
