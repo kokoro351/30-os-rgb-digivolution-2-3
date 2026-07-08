@@ -449,6 +449,69 @@ button {
   gap: 12px;
 }
 
+.starter-card {
+  max-width: 640px;
+}
+
+.starter-choices {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.starter-choice {
+  display: grid;
+  min-height: 188px;
+  border: 1px solid rgba(79, 246, 255, 0.34);
+  border-radius: 8px;
+  background:
+    radial-gradient(circle at 50% 26%, rgba(79, 246, 255, 0.18), transparent 42%),
+    rgba(9, 34, 49, 0.86);
+  color: var(--text);
+  cursor: pointer;
+  padding: 14px;
+  text-align: center;
+  touch-action: manipulation;
+}
+
+.starter-choice:active,
+.starter-choice:hover {
+  border-color: rgba(255, 223, 92, 0.72);
+  box-shadow: 0 0 22px rgba(255, 223, 92, 0.16);
+}
+
+.starter-preview {
+  position: relative;
+  display: grid;
+  height: 96px;
+  margin-bottom: 10px;
+  place-items: center;
+  border: 1px dashed rgba(255, 255, 255, 0.18);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.starter-preview::after {
+  content: attr(data-preview);
+  color: rgba(223, 252, 255, 0.5);
+  font: 800 12px Consolas, monospace;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.starter-preview .anim-preview {
+  position: absolute;
+  inset: 0;
+}
+
+.starter-choice strong {
+  color: #ffffff;
+}
+
+.starter-choice small {
+  color: rgba(223, 252, 255, 0.66);
+}
+
 .upgrade-card {
   min-height: 126px;
   border: 1px solid rgba(79, 246, 255, 0.32);
@@ -1101,6 +1164,26 @@ button {
     gap: 9px;
     overflow: auto;
     padding-bottom: 8px;
+  }
+
+  .starter-choices {
+    grid-template-columns: 1fr;
+    gap: 9px;
+    overflow: auto;
+    padding-bottom: 8px;
+  }
+
+  .starter-choice {
+    min-height: 148px;
+    grid-template-columns: 92px 1fr;
+    gap: 12px;
+    align-items: center;
+    text-align: left;
+  }
+
+  .starter-preview {
+    height: 92px;
+    margin-bottom: 0;
   }
 
   .upgrade-card {

@@ -14,6 +14,8 @@ Examples:
 ```text
 assets/sprites/botamon_01.png
 assets/sprites/botamon_02.png
+assets/sprites/babumon_01.png
+assets/sprites/babumon_02.png
 assets/sprites/agumon_01.png
 assets/sprites/agumon_02.png
 ```

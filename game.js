@@ -17,6 +17,7 @@ const ui = {
   evoGaugeText: document.getElementById("evoGaugeText"),
   dataGrid: document.getElementById("dataGrid"),
   skillList: document.getElementById("skillList"),
+  starterPanel: document.getElementById("starterPanel"),
   levelPanel: document.getElementById("levelPanel"),
   upgradeChoices: document.getElementById("upgradeChoices"),
   evolutionOverlay: document.getElementById("evolutionOverlay"),
@@ -40,6 +41,7 @@ const ui = {
 };
 
 const DATA_TYPES = ["Vaccine", "Data", "Virus", "Free"];
+const STARTERS = ["botamon", "babumon"];
 const SPECIAL_STAGE_ORDER = { Fresh: 0, "In-Training": 1, Rookie: 2, Champion: 3, Ultimate: 4, Mega: 5 };
 
 const STAGES = [
@@ -51,15 +53,16 @@ const STAGES = [
 
 const MONSTERS = [
   monster("botamon", "Botamon", "Fresh", "Free", "player_candidate", 90, 1.0, 8, 3, ["koromon", "tsunomon"], null, "#7cffe9", 17),
+  monster("babumon", "Babumon", "Fresh", "Free", "player_candidate", 88, 1.08, 8, 3, ["biyomon", "tentomon", "gomamon"], null, "#c7fff2", 17),
   monster("koromon", "Koromon", "In-Training", "Free", "player_candidate", 100, 1.02, 9, 4, ["agumon", "patamon"], "Botamon route", "#ff9fc8", 18),
   monster("tsunomon", "Tsunomon", "In-Training", "Data", "player_candidate", 105, 1.08, 9, 4, ["gabumon"], "Botamon + Data route", "#d8d6c8", 18),
   monster("agumon", "Agumon", "Rookie", "Vaccine", "player_candidate", 120, 1.1, 12, 5, ["greymon", "devimon"], "Koromon route", "#ffb340", 22),
   monster("gabumon", "Gabumon", "Rookie", "Data", "player_candidate", 112, 1.2, 11, 5, ["garurumon"], "Tsunomon route", "#65d9ff", 22),
   monster("patamon", "Patamon", "Rookie", "Free", "enemy", 95, 1.18, 9, 5, ["angemon"], "Wild enemy 03:00-08:00 / defeat to register", "#ffe66b", 20),
-  monster("tentomon", "Tentomon", "Rookie", "Vaccine", "enemy", 112, 0.95, 10, 5, ["kuwagamon"], "Wild enemy 03:00-08:00 / defeat to register", "#75ff9e", 21),
+  monster("tentomon", "Tentomon", "Rookie", "Vaccine", "player_candidate", 112, 0.95, 10, 5, ["kuwagamon"], "Babumon + Vaccine route / wild enemy 03:00-08:00", "#75ff9e", 21),
   monster("palmon", "Palmon", "Rookie", "Data", "enemy", 102, 1.0, 9, 5, ["kuwagamon"], "Wild enemy 03:00-08:00 / defeat to register", "#9dff70", 20),
-  monster("gomamon", "Gomamon", "Rookie", "Free", "enemy", 108, 1.08, 10, 5, ["garurumon"], "Wild enemy 03:00-08:00 / defeat to register", "#e7f7ff", 20),
-  monster("biyomon", "Biyomon", "Rookie", "Data", "enemy", 98, 1.25, 9, 5, ["birdramon"], "Wild enemy 03:00-08:00 / defeat to register", "#ff8fcf", 20),
+  monster("gomamon", "Gomamon", "Rookie", "Free", "player_candidate", 108, 1.08, 10, 5, ["garurumon"], "Babumon + Free route / wild enemy 03:00-08:00", "#e7f7ff", 20),
+  monster("biyomon", "Biyomon", "Rookie", "Data", "player_candidate", 98, 1.25, 9, 5, ["birdramon"], "Babumon + Data route / wild enemy 03:00-08:00", "#ff8fcf", 20),
   monster("greymon", "Greymon", "Champion", "Vaccine", "player_candidate", 210, 0.92, 20, 9, ["metalgreymon", "skullgreymon"], "Agumon + power", "#ff6a3d", 30),
   monster("garurumon", "Garurumon", "Champion", "Data", "player_candidate", 180, 1.35, 17, 9, ["weregarurumon"], "Gabumon route", "#70c7ff", 29),
   monster("devimon", "Devimon", "Champion", "Virus", "player_candidate", 190, 1.08, 19, 10, ["skullgreymon"], "Virus / area route", "#b178ff", 29),
@@ -162,10 +165,11 @@ let gameEnded = false;
 let audioCtx = null;
 let resizeQueued = true;
 let nextEnemyId = 1;
+let starterSelected = false;
 
 const state = createInitialState();
 
-function createInitialState() {
+function createInitialState(starterId = "botamon") {
   return {
     elapsed: 0,
     worldSize: 2600,
@@ -178,7 +182,7 @@ function createInitialState() {
       level: 1,
       xp: 0,
       xpNext: 18,
-      formId: "botamon",
+      formId: starterId,
       speed: 178,
       attack: 20,
       range: 165,
@@ -214,25 +218,50 @@ function createInitialState() {
   };
 }
 
-state.discovered.botamon = true;
-saveCodex();
-
 function resetGame() {
   const fresh = createInitialState();
   Object.keys(state).forEach((key) => delete state[key]);
   Object.assign(state, fresh);
-  state.discovered.botamon = true;
-  saveCodex();
+  starterSelected = false;
   pausedForChoice = false;
   evolutionLock = false;
   gameEnded = false;
   ui.levelPanel.classList.add("hidden");
+  ui.starterPanel.classList.remove("hidden");
   ui.evolutionOverlay.classList.add("hidden");
   ui.specialCutin.classList.add("hidden");
   ui.gameOverPanel.classList.add("hidden");
+  ui.codexPanel.classList.add("hidden");
   resetTouchMove();
   nextEnemyId = 1;
   lastTime = performance.now();
+}
+
+function beginRun(starterId) {
+  const safeStarter = STARTERS.includes(starterId) ? starterId : "botamon";
+  const fresh = createInitialState(safeStarter);
+  Object.keys(state).forEach((key) => delete state[key]);
+  Object.assign(state, fresh);
+  state.discovered[safeStarter] = true;
+  saveCodex();
+  starterSelected = true;
+  pausedForChoice = false;
+  evolutionLock = false;
+  gameEnded = false;
+  ui.starterPanel.classList.add("hidden");
+  ui.levelPanel.classList.add("hidden");
+  ui.gameOverPanel.classList.add("hidden");
+  ui.codexPanel.classList.add("hidden");
+  resetTouchMove();
+  nextEnemyId = 1;
+  spawnInitialEnemies();
+  lastTime = performance.now();
+}
+
+function spawnInitialEnemies() {
+  for (let i = 0; i < 12; i += 1) {
+    spawnEnemy(false);
+  }
 }
 
 function loadCodex() {
@@ -321,7 +350,7 @@ function pickEnemyMonster(forceBoss) {
 }
 
 function update(dt) {
-  if (pausedForChoice || evolutionLock || gameEnded || ui.codexPanel.classList.contains("hidden") === false) {
+  if (!starterSelected || pausedForChoice || evolutionLock || gameEnded || ui.codexPanel.classList.contains("hidden") === false) {
     return;
   }
 
@@ -910,6 +939,11 @@ function pickEvolutionCandidate(form) {
   if (p.level < requiredLevel) return null;
 
   const route = {
+    babumon: () => {
+      if (d.Vaccine >= 8 || u.power >= 1 || u.shield >= 1) return "tentomon";
+      if (d.Free >= 8 || u.magnet >= 1 || u.regen >= 1) return "gomamon";
+      return "biyomon";
+    },
     botamon: () => (d.Data >= 12 || u.speed >= 2 || u.cooldown >= 2 ? "tsunomon" : "koromon"),
     koromon: () => {
       if (d.Free >= 22 || u.magnet >= 3) return "patamon";
@@ -988,6 +1022,20 @@ function applyEvolutionBonus(formId) {
     gabumon: () => {
       p.speed *= 1.08;
       p.effects.drones += 1;
+    },
+    biyomon: () => {
+      p.speed *= 1.1;
+      p.effects.nova += 1;
+      p.effects.beam += 1;
+    },
+    tentomon: () => {
+      p.effects.shield += 1;
+      p.effects.orbit += 1;
+    },
+    gomamon: () => {
+      p.speed *= 1.06;
+      p.effects.drones += 1;
+      p.effects.shield += 1;
     },
     devimon: () => {
       p.effects.orbit += 1;
@@ -1387,6 +1435,9 @@ function evoReadiness() {
   if (p.formId === "botamon") {
     return clamp(Math.round((Math.max(d.Vaccine, d.Free, d.Data * 0.7) / 16) * 100), 0, 100);
   }
+  if (p.formId === "babumon") {
+    return clamp(Math.round((Math.max(d.Vaccine, d.Data, d.Free) / 14) * 100), 0, 100);
+  }
   if (p.formId === "koromon") {
     return clamp(Math.round((Math.max(d.Vaccine, d.Free * 0.6) / 14) * 100), 0, 100);
   }
@@ -1453,6 +1504,13 @@ function spritePreviewHtml(form) {
       ${sprites.map((src, index) => `<img class="anim-frame frame-${index}" src="${src}" alt="${form.name} frame ${index + 1}" onerror="this.classList.add('missing')">`).join("")}
     </span>
   `;
+}
+
+function hydrateStarterPreviews() {
+  document.querySelectorAll("[data-preview]").forEach((preview) => {
+    const form = MONSTER_BY_ID[preview.dataset.preview];
+    if (form) preview.innerHTML = spritePreviewHtml(form);
+  });
 }
 
 function endGame(cleared) {
@@ -1561,6 +1619,9 @@ window.addEventListener("keydown", startAudio, { once: true });
 ui.codexButton.addEventListener("click", showCodex);
 ui.closeCodex.addEventListener("click", () => ui.codexPanel.classList.add("hidden"));
 ui.restartButton.addEventListener("click", resetGame);
+document.querySelectorAll("[data-starter]").forEach((button) => {
+  button.addEventListener("click", () => beginRun(button.dataset.starter));
+});
 ui.touchSpecial.addEventListener("click", triggerSpecialMove);
 ui.touchPause.addEventListener("click", togglePause);
 ui.touchCodex.addEventListener("click", showCodex);
@@ -1584,9 +1645,6 @@ ui.touchStick.addEventListener("pointercancel", (event) => {
 });
 
 preloadSpriteImages();
-
-for (let i = 0; i < 12; i += 1) {
-  spawnEnemy(false);
-}
+hydrateStarterPreviews();
 
 requestAnimationFrame(loop);
