@@ -145,7 +145,7 @@ const ENEMY_ARCHETYPES = {
 };
 
 const ENEMY_SPAWN_TABLE = [
-  { until: 180, ids: ["botamon", "koromon", "tsunomon"] },
+  { until: 180, ids: ["botamon", "koromon", "tsunomon", "agumon", "tentomon"] },
   { until: 480, ids: ["agumon", "gabumon", "tentomon", "patamon", "palmon", "gomamon", "biyomon"] },
   { until: 900, ids: ["greymon", "garurumon", "devimon", "angemon", "kuwagamon", "birdramon"] },
   { until: Infinity, ids: ["metalgreymon", "skullgreymon", "andromon", "machinedramon", "weregarurumon"] }
@@ -718,11 +718,25 @@ function killEnemy(enemy) {
       radius: enemy.boss ? 5 : 3
     });
   }
+  dropEarlyVaccineShard(enemy);
   burst(enemy.x, enemy.y, enemy.color, enemy.boss ? 38 : 12);
   playTone(enemy.boss ? 90 : 260, enemy.boss ? 0.18 : 0.05, enemy.boss ? "sawtooth" : "triangle", 0.025);
   while (state.player.xp >= state.player.xpNext) {
     levelUp();
   }
+}
+
+function dropEarlyVaccineShard(enemy) {
+  if (state.elapsed > 180 || enemy.boss) return;
+  if (!["botamon", "koromon"].includes(enemy.monsterId)) return;
+  if (Math.random() > 0.35) return;
+  state.pickups.push({
+    x: enemy.x + rand(-14, 14),
+    y: enemy.y + rand(-14, 14),
+    type: "Vaccine",
+    value: 1,
+    radius: 4
+  });
 }
 
 function updateProjectiles(dt) {
@@ -896,9 +910,9 @@ function pickEvolutionCandidate(form) {
   if (p.level < requiredLevel) return null;
 
   const route = {
-    botamon: () => (d.Data >= 8 || u.speed >= 1 || u.cooldown >= 1 ? "tsunomon" : "koromon"),
+    botamon: () => (d.Data >= 12 || u.speed >= 2 || u.cooldown >= 2 ? "tsunomon" : "koromon"),
     koromon: () => {
-      if (d.Free >= 16 || u.magnet >= 2) return "patamon";
+      if (d.Free >= 22 || u.magnet >= 3) return "patamon";
       return "agumon";
     },
     tsunomon: () => "gabumon",
@@ -1371,7 +1385,10 @@ function evoReadiness() {
   const p = state.player;
   const d = state.data;
   if (p.formId === "botamon") {
-    return clamp(Math.round((Math.max(d.Vaccine, d.Data) / 18) * 100), 0, 100);
+    return clamp(Math.round((Math.max(d.Vaccine, d.Free, d.Data * 0.7) / 16) * 100), 0, 100);
+  }
+  if (p.formId === "koromon") {
+    return clamp(Math.round((Math.max(d.Vaccine, d.Free * 0.6) / 14) * 100), 0, 100);
   }
   if (p.formId === "agumon" || p.formId === "gabumon") {
     return clamp(Math.round((Math.max(d.Virus / 26, d.Vaccine / 42) * 100)), 0, 100);
