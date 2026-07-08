@@ -55,21 +55,21 @@ const MONSTERS = [
   monster("tsunomon", "Tsunomon", "In-Training", "Data", "player_candidate", 105, 1.08, 9, 4, ["gabumon"], "Botamon + Data route", "#d8d6c8", 18),
   monster("agumon", "Agumon", "Rookie", "Vaccine", "player_candidate", 120, 1.1, 12, 5, ["greymon", "devimon"], "Koromon route", "#ffb340", 22),
   monster("gabumon", "Gabumon", "Rookie", "Data", "player_candidate", 112, 1.2, 11, 5, ["garurumon"], "Tsunomon route", "#65d9ff", 22),
-  monster("patamon", "Patamon", "Rookie", "Free", "enemy", 95, 1.18, 9, 5, ["angemon"], "Free data route", "#ffe66b", 20),
-  monster("tentomon", "Tentomon", "Rookie", "Vaccine", "enemy", 112, 0.95, 10, 5, ["kuwagamon"], "Vaccine data route", "#75ff9e", 21),
-  monster("palmon", "Palmon", "Rookie", "Data", "enemy", 102, 1.0, 9, 5, ["kuwagamon"], "Data forest route", "#9dff70", 20),
-  monster("gomamon", "Gomamon", "Rookie", "Free", "enemy", 108, 1.08, 10, 5, ["garurumon"], "Free sea route", "#e7f7ff", 20),
-  monster("biyomon", "Biyomon", "Rookie", "Data", "enemy", 98, 1.25, 9, 5, ["birdramon"], "Data sky route", "#ff8fcf", 20),
+  monster("patamon", "Patamon", "Rookie", "Free", "enemy", 95, 1.18, 9, 5, ["angemon"], "Wild enemy 03:00-08:00 / defeat to register", "#ffe66b", 20),
+  monster("tentomon", "Tentomon", "Rookie", "Vaccine", "enemy", 112, 0.95, 10, 5, ["kuwagamon"], "Wild enemy 03:00-08:00 / defeat to register", "#75ff9e", 21),
+  monster("palmon", "Palmon", "Rookie", "Data", "enemy", 102, 1.0, 9, 5, ["kuwagamon"], "Wild enemy 03:00-08:00 / defeat to register", "#9dff70", 20),
+  monster("gomamon", "Gomamon", "Rookie", "Free", "enemy", 108, 1.08, 10, 5, ["garurumon"], "Wild enemy 03:00-08:00 / defeat to register", "#e7f7ff", 20),
+  monster("biyomon", "Biyomon", "Rookie", "Data", "enemy", 98, 1.25, 9, 5, ["birdramon"], "Wild enemy 03:00-08:00 / defeat to register", "#ff8fcf", 20),
   monster("greymon", "Greymon", "Champion", "Vaccine", "player_candidate", 210, 0.92, 20, 9, ["metalgreymon", "skullgreymon"], "Agumon + power", "#ff6a3d", 30),
   monster("garurumon", "Garurumon", "Champion", "Data", "player_candidate", 180, 1.35, 17, 9, ["weregarurumon"], "Gabumon route", "#70c7ff", 29),
   monster("devimon", "Devimon", "Champion", "Virus", "player_candidate", 190, 1.08, 19, 10, ["skullgreymon"], "Virus / area route", "#b178ff", 29),
-  monster("angemon", "Angemon", "Champion", "Vaccine", "enemy", 185, 1.08, 18, 10, ["andromon"], "Patamon route", "#fff0a8", 29),
-  monster("kuwagamon", "Kuwagamon", "Champion", "Virus", "enemy", 205, 1.0, 21, 10, ["andromon"], "Insect route", "#76ff72", 30),
-  monster("birdramon", "Birdramon", "Champion", "Data", "enemy", 175, 1.28, 18, 10, ["metalgreymon"], "Biyomon route", "#ff7048", 29),
+  monster("angemon", "Angemon", "Champion", "Vaccine", "enemy", 185, 1.08, 18, 10, ["andromon"], "Patamon branch / wild enemy discovery", "#fff0a8", 29),
+  monster("kuwagamon", "Kuwagamon", "Champion", "Virus", "enemy", 205, 1.0, 21, 10, ["andromon"], "Tentomon or Palmon branch / wild enemy discovery", "#76ff72", 30),
+  monster("birdramon", "Birdramon", "Champion", "Data", "enemy", 175, 1.28, 18, 10, ["metalgreymon"], "Biyomon branch / wild enemy discovery", "#ff7048", 29),
   monster("metalgreymon", "MetalGreymon", "Ultimate", "Vaccine", "player_candidate", 330, 0.88, 34, 16, ["wargreymon"], "Greymon + boss data", "#ff6a3d", 36),
   monster("weregarurumon", "WereGarurumon", "Ultimate", "Data", "player_candidate", 285, 1.42, 30, 16, ["metalgarurumon"], "Garurumon route", "#8ed8ff", 35),
   monster("skullgreymon", "SkullGreymon", "Ultimate", "Virus", "player_candidate", 350, 0.82, 38, 18, ["machinedramon"], "Dark Greymon route", "#d8d8d8", 36),
-  monster("andromon", "Andromon", "Ultimate", "Vaccine", "enemy", 310, 0.9, 32, 17, ["machinedramon"], "Machine data route", "#bfc8d4", 35),
+  monster("andromon", "Andromon", "Ultimate", "Vaccine", "enemy", 310, 0.9, 32, 17, ["machinedramon"], "15:00+ wild enemy / machine branch discovery", "#bfc8d4", 35),
   monster("wargreymon", "WarGreymon", "Mega", "Vaccine", "player_candidate", 460, 1.08, 48, 28, [], "MetalGreymon route", "#ffd45c", 42),
   monster("metalgarurumon", "MetalGarurumon", "Mega", "Data", "player_candidate", 420, 1.35, 44, 28, [], "WereGarurumon route", "#8ee8ff", 41),
   monster("machinedramon", "Machinedramon", "Mega", "Virus", "player_candidate", 500, 0.78, 54, 32, [], "Virus machine route", "#ff3e71", 42)
@@ -1409,8 +1409,9 @@ function renderEvolutionBranch(formId, visited = []) {
 
 function renderEvolutionNode(form) {
   const found = state.discovered[form.id];
-  const from = form.evolutionFrom.length ? form.evolutionFrom.map((id) => MONSTER_BY_ID[id]?.name || id).join(" / ") : "START";
+  const from = form.evolutionFrom.length ? form.evolutionFrom.map((id) => MONSTER_BY_ID[id]?.name || id).join(" / ") : form.role === "enemy" ? "WILD ENEMY" : "START";
   const to = form.evolutionTo.length ? form.evolutionTo.map((id) => MONSTER_BY_ID[id]?.name || id).join(" / ") : "FINAL";
+  const role = form.role === "enemy" ? "Enemy discovery" : "Player route";
   const portrait = found ? spritePreviewHtml(form) : `<span class="unknown-mark">???</span>`;
   return `
     <article class="tree-node ${found ? "found" : "locked"}" style="--node-color:${found ? form.color : "rgba(255,255,255,.28)"}">
@@ -1418,6 +1419,7 @@ function renderEvolutionNode(form) {
       <div class="tree-copy">
         <strong>${found ? form.name : "Undiscovered"}</strong>
         <span>${found ? `${form.stage} / ${form.attribute}` : "Stage / Attribute ???"}</span>
+        <small>ROLE: ${found ? role : "???"}</small>
         <small>FROM: ${found ? from : "???"}</small>
         <small>TO: ${found ? to : "???"}</small>
         <small>COND: ${found ? form.condition : "???"}</small>
