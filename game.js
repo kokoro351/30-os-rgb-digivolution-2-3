@@ -1380,25 +1380,50 @@ function evoReadiness() {
 }
 
 function showCodex() {
-  ui.codexEntries.innerHTML = FORMS.map((form) => {
-    const found = state.discovered[form.id];
-    const portrait = found ? spritePreviewHtml(form) : "???";
-    const from = form.evolutionFrom.length ? form.evolutionFrom.map((id) => MONSTER_BY_ID[id]?.name || id).join(" / ") : "-";
-    const to = form.evolutionTo.length ? form.evolutionTo.map((id) => MONSTER_BY_ID[id]?.name || id).join(" / ") : "-";
-    return `
-      <article class="entry ${found ? "" : "locked"}">
-        <div class="portrait" style="border-color:${found ? form.color : "rgba(255,255,255,.2)"}">
-          ${portrait}
-        </div>
+  const roots = FORMS.filter((form) => form.evolutionFrom.length === 0);
+  const discoveredCount = Object.keys(state.discovered).filter((id) => state.discovered[id]).length;
+  ui.codexEntries.innerHTML = `
+    <div class="codex-summary">
+      <strong>EVOLUTION TREE</strong>
+      <span>${discoveredCount}/${FORMS.length} discovered</span>
+    </div>
+    <div class="evolution-tree">
+      ${roots.map((form) => renderEvolutionBranch(form.id)).join("")}
+    </div>
+  `;
+  ui.codexPanel.classList.remove("hidden");
+}
+
+function renderEvolutionBranch(formId, visited = []) {
+  const form = MONSTER_BY_ID[formId];
+  if (!form) return "";
+  const looped = visited.includes(formId);
+  const children = looped ? [] : form.evolutionTo;
+  return `
+    <div class="tree-root">
+      ${renderEvolutionNode(form)}
+      ${children.length ? `<div class="tree-children">${children.map((id) => renderEvolutionBranch(id, [...visited, formId])).join("")}</div>` : ""}
+    </div>
+  `;
+}
+
+function renderEvolutionNode(form) {
+  const found = state.discovered[form.id];
+  const from = form.evolutionFrom.length ? form.evolutionFrom.map((id) => MONSTER_BY_ID[id]?.name || id).join(" / ") : "START";
+  const to = form.evolutionTo.length ? form.evolutionTo.map((id) => MONSTER_BY_ID[id]?.name || id).join(" / ") : "FINAL";
+  const portrait = found ? spritePreviewHtml(form) : `<span class="unknown-mark">???</span>`;
+  return `
+    <article class="tree-node ${found ? "found" : "locked"}" style="--node-color:${found ? form.color : "rgba(255,255,255,.28)"}">
+      <div class="tree-portrait">${portrait}</div>
+      <div class="tree-copy">
         <strong>${found ? form.name : "Undiscovered"}</strong>
-        <p>${found ? `${form.stage} / ${form.attribute}` : "Evolution data is still encrypted."}</p>
+        <span>${found ? `${form.stage} / ${form.attribute}` : "Stage / Attribute ???"}</span>
         <small>FROM: ${found ? from : "???"}</small>
         <small>TO: ${found ? to : "???"}</small>
-        <small>UNLOCK: ${found ? form.condition : "???"}</small>
-      </article>
-    `;
-  }).join("");
-  ui.codexPanel.classList.remove("hidden");
+        <small>COND: ${found ? form.condition : "???"}</small>
+      </div>
+    </article>
+  `;
 }
 
 function spritePreviewHtml(form) {
