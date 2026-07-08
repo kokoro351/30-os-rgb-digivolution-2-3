@@ -853,7 +853,7 @@ function drawPlayer() {
   ctx.shadowBlur = 18;
 
   if (sprite && sprite.complete && sprite.naturalWidth > 0) {
-    const size = form.radius * 3.2;
+    const size = form.radius * 5;
     ctx.drawImage(sprite, -size / 2, -size / 2, size, size);
     ctx.restore();
     return;
@@ -1061,10 +1061,13 @@ function evoReadiness() {
 function showCodex() {
   ui.codexEntries.innerHTML = FORMS.map((form) => {
     const found = state.discovered[form.id];
+    const portrait = found
+      ? `<img src="${SPRITES[form.id]}" alt="${form.name}" onerror="this.replaceWith(document.createTextNode('画像準備中 / silhouette'))">`
+      : "？？？";
     return `
       <article class="entry ${found ? "" : "locked"}">
         <div class="portrait" style="border-color:${found ? form.color : "rgba(255,255,255,.2)"}">
-          ${found ? "画像準備中 / silhouette" : "？？？"}
+          ${portrait}
         </div>
         <strong>${found ? form.name : "未発見"}</strong>
         <p>${found ? form.desc : "この進化ルートはまだ解析されていない。"}</p>
