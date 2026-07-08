@@ -4,7 +4,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no" />
     <title>DIGIVICE SURVIVOR</title>
-    <link rel="stylesheet" href="style.css?v=monster-animation-1" />
+    <link rel="stylesheet" href="style.css?v=special-move-1" />
   </head>
   <body>
     <main class="shell">
@@ -48,6 +48,7 @@
               <div id="touchKnob" class="touch-knob"></div>
             </div>
             <div class="touch-actions">
+              <button id="touchSpecial" class="touch-action special-action locked" type="button">SPECIAL</button>
               <button id="touchPause" class="touch-action" type="button">PAUSE</button>
               <button id="touchCodex" class="touch-action" type="button">CODEX</button>
             </div>
@@ -68,6 +69,15 @@
             <div class="evo-core"></div>
             <div class="evo-title">DIGIVOLUTION</div>
             <div id="evoName" class="evo-name">AGUMON</div>
+          </div>
+
+          <div id="specialCutin" class="special-cutin hidden">
+            <div class="cutin-noise"></div>
+            <img id="cutinImage" src="" alt="" />
+            <div class="cutin-copy">
+              <span>MEGA SPECIAL</span>
+              <strong id="cutinName">SPECIAL MOVE</strong>
+            </div>
           </div>
 
           <div id="codexPanel" class="codex hidden">
@@ -96,6 +106,6 @@
         </div>
       </section>
     </main>
-    <script src="game.js?v=monster-animation-1"></script>
+    <script src="game.js?v=special-move-1"></script>
   </body>
 </html>

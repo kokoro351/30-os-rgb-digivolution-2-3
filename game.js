@@ -31,11 +31,16 @@ const ui = {
   restartButton: document.getElementById("restartButton"),
   touchStick: document.getElementById("touchStick"),
   touchKnob: document.getElementById("touchKnob"),
+  touchSpecial: document.getElementById("touchSpecial"),
   touchPause: document.getElementById("touchPause"),
-  touchCodex: document.getElementById("touchCodex")
+  touchCodex: document.getElementById("touchCodex"),
+  specialCutin: document.getElementById("specialCutin"),
+  cutinImage: document.getElementById("cutinImage"),
+  cutinName: document.getElementById("cutinName")
 };
 
 const DATA_TYPES = ["Vaccine", "Data", "Virus", "Free"];
+const SPECIAL_STAGE_ORDER = { Fresh: 0, "In-Training": 1, Rookie: 2, Champion: 3, Ultimate: 4, Mega: 5 };
 
 const STAGES = [
   { name: "Data Shore", color: "#32d5ff", enemyBias: ["Free", "Data"] },
@@ -179,6 +184,8 @@ function createInitialState() {
       range: 165,
       cooldown: 0.72,
       cooldownLeft: 0,
+      specialCooldown: 14,
+      specialCooldownLeft: 0,
       magnet: 84,
       effects: {
         shield: 0,
@@ -199,6 +206,7 @@ function createInitialState() {
     projectiles: [],
     pickups: [],
     particles: [],
+    specialEffects: [],
     discovered: loadCodex(),
     bossTimer: 60,
     spawnTimer: 0,
@@ -220,6 +228,7 @@ function resetGame() {
   gameEnded = false;
   ui.levelPanel.classList.add("hidden");
   ui.evolutionOverlay.classList.add("hidden");
+  ui.specialCutin.classList.add("hidden");
   ui.gameOverPanel.classList.add("hidden");
   resetTouchMove();
   nextEnemyId = 1;
@@ -336,15 +345,22 @@ function update(dt) {
 
   updatePlayer(dt);
   updatePassiveEffects(dt);
+  updateSpecialCooldown(dt);
   updateEnemies(dt);
   updateProjectiles(dt);
   updatePickups(dt);
   updateParticles(dt);
+  updateSpecialEffects(dt);
   tryEvolution();
 
   if (state.elapsed >= 30 * 60) {
     endGame(true);
   }
+}
+
+function updateSpecialCooldown(dt) {
+  const p = state.player;
+  p.specialCooldownLeft = Math.max(0, p.specialCooldownLeft - dt);
 }
 
 function resizeCanvasToDisplay() {
@@ -444,6 +460,159 @@ function fireDroneShot(droneIndex, target) {
     chain: Math.max(0, state.player.effects.chain - 1),
     hitIds: new Set()
   });
+}
+
+function hasSpecialMove(form = currentForm()) {
+  return (SPECIAL_STAGE_ORDER[form.stage] || 0) >= SPECIAL_STAGE_ORDER.Ultimate;
+}
+
+function isMegaForm(form = currentForm()) {
+  return form.stage === "Mega";
+}
+
+function specialMoveName(form = currentForm()) {
+  const names = {
+    metalgreymon: "Giga Burst",
+    weregarurumon: "Crescent Rush",
+    skullgreymon: "Dark Bone Quake",
+    andromon: "Guardromon Protocol",
+    wargreymon: "Brave Tornado",
+    metalgarurumon: "Cocytus Barrage",
+    machinedramon: "Infinity Cannon"
+  };
+  return names[form.id] || "Special Move";
+}
+
+function triggerSpecialMove() {
+  if (pausedForChoice || evolutionLock || gameEnded || ui.codexPanel.classList.contains("hidden") === false) return false;
+
+  const p = state.player;
+  const form = currentForm();
+  if (!hasSpecialMove(form)) {
+    state.shake = Math.max(state.shake, 4);
+    playTone(150, 0.05, "square", 0.012);
+    return false;
+  }
+  if (p.specialCooldownLeft > 0) {
+    state.shake = Math.max(state.shake, 3);
+    playTone(190, 0.04, "square", 0.012);
+    return false;
+  }
+
+  startAudio();
+  if (isMegaForm(form)) showSpecialCutin(form);
+  executeSpecialMove(form);
+  p.specialCooldown = isMegaForm(form) ? 18 : 14;
+  p.specialCooldownLeft = p.specialCooldown;
+  state.shake = Math.max(state.shake, isMegaForm(form) ? 22 : 13);
+  playTone(isMegaForm(form) ? 95 : 150, isMegaForm(form) ? 0.26 : 0.16, "sawtooth", 0.04);
+  return true;
+}
+
+function executeSpecialMove(form) {
+  const p = state.player;
+  const power = p.attack * (isMegaForm(form) ? 4.2 : 2.7);
+  const color = form.color;
+  const actions = {
+    metalgreymon: () => radialPierce(12, power * 0.9, color, 660, 1.0, 3),
+    weregarurumon: () => rapidLockOn(9, power * 0.75, color, 720),
+    skullgreymon: () => areaBlast(230, power * 1.1, color, "curse"),
+    andromon: () => {
+      p.hp = Math.min(p.maxHp, p.hp + 34);
+      areaBlast(190, power * 0.8, color, "guard");
+    },
+    wargreymon: () => {
+      areaBlast(260, power * 1.1, color, "brave");
+      radialPierce(18, power * 0.72, color, 760, 1.05, 5);
+    },
+    metalgarurumon: () => {
+      rapidLockOn(18, power * 0.68, color, 820);
+      radialPierce(14, power * 0.52, color, 720, 0.8, 2);
+    },
+    machinedramon: () => {
+      areaBlast(310, power * 1.25, color, "infinity");
+      rapidLockOn(10, power * 0.9, color, 620);
+    }
+  };
+  (actions[form.id] || (() => areaBlast(210, power, color, "special")))();
+  state.specialEffects.push({
+    x: p.x,
+    y: p.y,
+    radius: isMegaForm(form) ? 320 : 220,
+    color,
+    life: 0.55,
+    maxLife: 0.55,
+    label: specialMoveName(form)
+  });
+  burst(p.x, p.y, color, isMegaForm(form) ? 90 : 48);
+}
+
+function areaBlast(radius, damage, color, mode) {
+  const p = state.player;
+  for (const enemy of state.enemies) {
+    const dist = Math.hypot(enemy.x - p.x, enemy.y - p.y);
+    if (dist < radius + enemy.radius) {
+      enemy.hp -= damage * (1 - dist / (radius + enemy.radius) * 0.38);
+      if (mode === "curse" || mode === "infinity") enemy.speed *= 0.94;
+      burst(enemy.x, enemy.y, color, 8);
+    }
+  }
+}
+
+function radialPierce(count, damage, color, speed, life, pierce) {
+  const p = state.player;
+  for (let i = 0; i < count; i += 1) {
+    const angle = (i * Math.PI * 2) / count + state.elapsed * 0.35;
+    state.projectiles.push({
+      x: p.x,
+      y: p.y,
+      vx: Math.cos(angle) * speed,
+      vy: Math.sin(angle) * speed,
+      life,
+      damage,
+      radius: 8,
+      color,
+      pierce,
+      chain: state.player.effects.chain + 1,
+      hitIds: new Set()
+    });
+  }
+}
+
+function rapidLockOn(count, damage, color, speed) {
+  const p = state.player;
+  const targets = [...state.enemies]
+    .sort((a, b) => Math.hypot(a.x - p.x, a.y - p.y) - Math.hypot(b.x - p.x, b.y - p.y))
+    .slice(0, count);
+  const fallbackCount = targets.length ? 0 : count;
+
+  targets.forEach((target, index) => {
+    const angle = Math.atan2(target.y - p.y, target.x - p.x) + (index % 3 - 1) * 0.08;
+    state.projectiles.push({
+      x: p.x,
+      y: p.y,
+      vx: Math.cos(angle) * speed,
+      vy: Math.sin(angle) * speed,
+      life: 0.92,
+      damage,
+      radius: 6,
+      color,
+      pierce: 1,
+      chain: 0,
+      hitIds: new Set()
+    });
+  });
+
+  if (fallbackCount > 0) radialPierce(Math.min(12, fallbackCount), damage, color, speed, 0.75, 1);
+}
+
+function showSpecialCutin(form) {
+  const image = getAnimatedSprite(form, 280);
+  ui.cutinImage.src = image ? image.src : form.sprites[0];
+  ui.cutinImage.alt = form.name;
+  ui.cutinName.textContent = `${form.name} / ${specialMoveName(form)}`;
+  ui.specialCutin.classList.remove("hidden");
+  window.setTimeout(() => ui.specialCutin.classList.add("hidden"), 920);
 }
 
 function updateEnemies(dt) {
@@ -626,6 +795,14 @@ function updateParticles(dt) {
   }
 }
 
+function updateSpecialEffects(dt) {
+  for (let i = state.specialEffects.length - 1; i >= 0; i -= 1) {
+    const effect = state.specialEffects[i];
+    effect.life -= dt;
+    if (effect.life <= 0) state.specialEffects.splice(i, 1);
+  }
+}
+
 function levelUp() {
   const p = state.player;
   p.xp -= p.xpNext;
@@ -760,6 +937,9 @@ function evolveTo(formId) {
   state.player.attack *= 1.28;
   state.player.range *= 1.08;
   applyEvolutionBonus(formId);
+  if (hasSpecialMove(form)) {
+    state.player.specialCooldownLeft = 0;
+  }
   state.discovered[formId] = true;
   saveCodex();
   ui.evoName.textContent = form.name;
@@ -880,6 +1060,7 @@ function draw() {
   drawEnemies();
   drawPassiveEffects();
   drawPlayer();
+  drawSpecialEffects();
   drawParticles();
   ctx.restore();
   drawMiniMap();
@@ -1098,6 +1279,29 @@ function drawParticles() {
   }
 }
 
+function drawSpecialEffects() {
+  for (const effect of state.specialEffects) {
+    const pos = toScreen(effect.x, effect.y);
+    const t = 1 - effect.life / effect.maxLife;
+    ctx.save();
+    ctx.globalAlpha = Math.max(0, effect.life / effect.maxLife);
+    ctx.strokeStyle = effect.color;
+    ctx.fillStyle = hexToRgba(effect.color, 0.08);
+    ctx.lineWidth = 4;
+    ctx.shadowColor = effect.color;
+    ctx.shadowBlur = 26;
+    ctx.beginPath();
+    ctx.arc(pos.x, pos.y, effect.radius * (0.35 + t * 0.85), 0, Math.PI * 2);
+    ctx.fill();
+    ctx.stroke();
+    ctx.font = "bold 14px Consolas, monospace";
+    ctx.textAlign = "center";
+    ctx.fillStyle = "#ffffff";
+    ctx.fillText(effect.label, pos.x, pos.y - effect.radius * 0.28);
+    ctx.restore();
+  }
+}
+
 function drawMiniMap() {
   mapCtx.clearRect(0, 0, miniMap.width, miniMap.height);
   mapCtx.fillStyle = "rgba(0, 0, 0, 0.35)";
@@ -1141,6 +1345,26 @@ function updateHud() {
   ui.skillList.innerHTML = p.skills.length
     ? p.skills.map((skill) => `<li><span>${skill.name}</span><strong>Lv${skill.count}</strong></li>`).join("")
     : "<li><span>Basic Bit</span><strong>Lv1</strong></li>";
+
+  updateSpecialButton(form);
+}
+
+function updateSpecialButton(form = currentForm()) {
+  if (!ui.touchSpecial) return;
+  const p = state.player;
+  const unlocked = hasSpecialMove(form);
+  const ready = unlocked && p.specialCooldownLeft <= 0;
+  ui.touchSpecial.classList.toggle("locked", !unlocked);
+  ui.touchSpecial.classList.toggle("ready", ready);
+  ui.touchSpecial.classList.toggle("cooling", unlocked && !ready);
+  ui.touchSpecial.disabled = !unlocked;
+  if (!unlocked) {
+    ui.touchSpecial.textContent = "SPECIAL LOCK";
+  } else if (!ready) {
+    ui.touchSpecial.textContent = `SPECIAL ${Math.ceil(p.specialCooldownLeft)}s`;
+  } else {
+    ui.touchSpecial.textContent = specialMoveName(form);
+  }
 }
 
 function evoReadiness() {
@@ -1270,8 +1494,13 @@ function togglePause() {
 
 window.addEventListener("keydown", (event) => {
   keys.add(event.key.toLowerCase());
+  if (event.repeat) return;
   if (event.code === "Space") {
+    event.preventDefault();
     togglePause();
+  } else if (event.code === "ShiftLeft" || event.code === "ShiftRight" || event.code === "Enter") {
+    event.preventDefault();
+    triggerSpecialMove();
   }
 });
 
@@ -1288,6 +1517,7 @@ window.addEventListener("keydown", startAudio, { once: true });
 ui.codexButton.addEventListener("click", showCodex);
 ui.closeCodex.addEventListener("click", () => ui.codexPanel.classList.add("hidden"));
 ui.restartButton.addEventListener("click", resetGame);
+ui.touchSpecial.addEventListener("click", triggerSpecialMove);
 ui.touchPause.addEventListener("click", togglePause);
 ui.touchCodex.addEventListener("click", showCodex);
 ui.touchStick.addEventListener("pointerdown", (event) => {
