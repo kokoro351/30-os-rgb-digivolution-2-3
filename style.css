@@ -545,6 +545,47 @@ button {
   display: none;
 }
 
+.ending-device {
+  position: relative;
+  width: min(280px, 72vw);
+  height: 180px;
+  margin: 18px auto 8px;
+  border: 3px solid rgba(79, 246, 255, 0.72);
+  border-radius: 34px 34px 46px 46px;
+  background:
+    radial-gradient(circle at 50% 35%, rgba(255, 255, 255, 0.42), transparent 22%),
+    linear-gradient(135deg, rgba(223, 252, 255, 0.24), rgba(4, 24, 38, 0.96));
+  box-shadow: 0 0 52px rgba(79, 246, 255, 0.42), inset 0 0 28px rgba(255, 255, 255, 0.12);
+  overflow: hidden;
+  animation: endingDeviceGlow 1.4s ease-in-out infinite alternate;
+}
+
+.ending-device.hidden {
+  display: none;
+}
+
+.device-light {
+  position: absolute;
+  inset: -35%;
+  background:
+    radial-gradient(circle, rgba(255, 255, 255, 0.9), rgba(255, 223, 92, 0.36) 18%, rgba(79, 246, 255, 0.16) 34%, transparent 58%);
+  animation: endingLightSpin 3.2s linear infinite;
+}
+
+.device-screen {
+  position: absolute;
+  inset: 44px 48px 54px;
+  display: grid;
+  place-items: center;
+  border: 2px solid rgba(255, 255, 255, 0.54);
+  border-radius: 12px;
+  background: rgba(0, 12, 20, 0.78);
+  color: #ffdf5c;
+  font: 900 24px Consolas, monospace;
+  letter-spacing: 0.14em;
+  text-shadow: 0 0 16px rgba(255, 223, 92, 0.82);
+}
+
 .upgrade-card {
   min-height: 126px;
   border: 1px solid rgba(79, 246, 255, 0.32);
@@ -913,6 +954,24 @@ button {
 
   to {
     transform: translateX(3%);
+  }
+}
+
+@keyframes endingDeviceGlow {
+  from {
+    filter: brightness(1);
+    transform: translateY(0);
+  }
+
+  to {
+    filter: brightness(1.28);
+    transform: translateY(-3px);
+  }
+}
+
+@keyframes endingLightSpin {
+  to {
+    transform: rotate(360deg);
   }
 }
 
