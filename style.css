@@ -380,7 +380,7 @@ button {
     linear-gradient(100deg, rgba(1, 6, 11, 0.95) 0%, rgba(1, 6, 11, 0.88) 42%, rgba(255, 62, 113, 0.2) 100%),
     rgba(1, 6, 11, 0.78);
   pointer-events: none;
-  animation: cutinIn 0.9s both;
+  animation: cutinIn 2s both;
 }
 
 .special-cutin img {
@@ -455,7 +455,7 @@ button {
 
 .starter-choices {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 12px;
 }
 
@@ -510,6 +510,39 @@ button {
 
 .starter-choice small {
   color: rgba(223, 252, 255, 0.66);
+}
+
+.ending-credit {
+  display: grid;
+  margin: 18px auto;
+  min-height: 86px;
+  max-width: 420px;
+  place-items: center;
+  border: 1px solid rgba(255, 223, 92, 0.58);
+  border-radius: 8px;
+  background:
+    linear-gradient(135deg, rgba(255, 223, 92, 0.16), rgba(79, 246, 255, 0.12)),
+    rgba(3, 16, 26, 0.88);
+  color: #fff;
+  font: 900 clamp(20px, 5vw, 38px) Consolas, monospace;
+  letter-spacing: 0.08em;
+  text-align: center;
+  text-decoration: none;
+  text-shadow: 0 0 18px rgba(255, 223, 92, 0.54);
+  box-shadow: inset 0 0 18px rgba(255, 223, 92, 0.1), 0 0 28px rgba(79, 246, 255, 0.16);
+}
+
+.ending-credit::before {
+  content: "CREDIT";
+  display: block;
+  margin-bottom: 4px;
+  color: #ffdf5c;
+  font-size: 11px;
+  letter-spacing: 0.24em;
+}
+
+.ending-credit.hidden {
+  display: none;
 }
 
 .upgrade-card {
@@ -859,8 +892,8 @@ button {
     transform: translateX(-8%);
   }
 
-  16%,
-  72% {
+  12%,
+  88% {
     clip-path: inset(0);
     opacity: 1;
     transform: translateX(0);

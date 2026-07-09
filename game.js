@@ -29,6 +29,7 @@ const ui = {
   gameOverPanel: document.getElementById("gameOverPanel"),
   resultTitle: document.getElementById("resultTitle"),
   resultText: document.getElementById("resultText"),
+  endingCredit: document.getElementById("endingCredit"),
   restartButton: document.getElementById("restartButton"),
   touchStick: document.getElementById("touchStick"),
   touchKnob: document.getElementById("touchKnob"),
@@ -41,7 +42,8 @@ const ui = {
 };
 
 const DATA_TYPES = ["Vaccine", "Data", "Virus", "Free"];
-const STARTERS = ["botamon", "babumon"];
+const STARTERS = ["botamon", "babumon", "tanemon"];
+const SHOTENGAI_URL = "https://natsuyasumi-shotengai.vercel.app/";
 const SPECIAL_STAGE_ORDER = { Fresh: 0, "In-Training": 1, Rookie: 2, Champion: 3, Ultimate: 4, Mega: 5 };
 
 const STAGES = [
@@ -54,37 +56,49 @@ const STAGES = [
 const MONSTERS = [
   monster("botamon", "Botamon", "Fresh", "Free", "player_candidate", 90, 1.0, 8, 3, ["koromon", "tsunomon"], null, "#7cffe9", 17),
   monster("babumon", "Babumon", "Fresh", "Free", "player_candidate", 88, 1.08, 8, 3, ["biyomon", "tentomon", "gomamon"], null, "#c7fff2", 17),
+  monster("tanemon", "Tanemon", "Fresh", "Data", "player_candidate", 92, 0.98, 8, 3, ["palmon", "plotmon", "kokuwamon"], null, "#9dff70", 17),
   monster("koromon", "Koromon", "In-Training", "Free", "player_candidate", 100, 1.02, 9, 4, ["agumon", "patamon"], "Botamon route", "#ff9fc8", 18),
   monster("tsunomon", "Tsunomon", "In-Training", "Data", "player_candidate", 105, 1.08, 9, 4, ["gabumon"], "Botamon + Data route", "#d8d6c8", 18),
   monster("agumon", "Agumon", "Rookie", "Vaccine", "player_candidate", 120, 1.1, 12, 5, ["greymon", "devimon"], "Koromon route", "#ffb340", 22),
   monster("gabumon", "Gabumon", "Rookie", "Data", "player_candidate", 112, 1.2, 11, 5, ["garurumon"], "Tsunomon route", "#65d9ff", 22),
   monster("patamon", "Patamon", "Rookie", "Free", "enemy", 95, 1.18, 9, 5, ["angemon"], "Wild enemy 03:00-08:00 / defeat to register", "#ffe66b", 20),
   monster("tentomon", "Tentomon", "Rookie", "Vaccine", "player_candidate", 112, 0.95, 10, 5, ["kabuterimon"], "Babumon + Vaccine route / wild enemy 03:00-08:00", "#75ff9e", 21),
-  monster("palmon", "Palmon", "Rookie", "Data", "enemy", 102, 1.0, 9, 5, ["kuwagamon"], "Wild enemy 03:00-08:00 / defeat to register", "#9dff70", 20),
+  monster("palmon", "Palmon", "Rookie", "Data", "player_candidate", 102, 1.0, 9, 5, ["togemon"], "Tanemon + Data route / wild enemy 03:00-08:00", "#9dff70", 20),
   monster("gomamon", "Gomamon", "Rookie", "Free", "player_candidate", 108, 1.08, 10, 5, ["ikkakumon"], "Babumon + Free route / wild enemy 03:00-08:00", "#e7f7ff", 20),
   monster("biyomon", "Biyomon", "Rookie", "Data", "player_candidate", 98, 1.25, 9, 5, ["birdramon"], "Babumon + Data route / wild enemy 03:00-08:00", "#ff8fcf", 20),
+  monster("plotmon", "Plotmon", "Rookie", "Vaccine", "player_candidate", 104, 1.16, 10, 5, ["tailmon"], "Tanemon + Vaccine route", "#79eaff", 20),
+  monster("kokuwamon", "Kokuwamon", "Rookie", "Virus", "player_candidate", 112, 1.0, 11, 5, ["kabuterimon"], "Tanemon + machine route", "#ff705c", 20),
   monster("greymon", "Greymon", "Champion", "Vaccine", "player_candidate", 210, 0.92, 20, 9, ["metalgreymon", "skullgreymon"], "Agumon + power", "#ff6a3d", 30),
   monster("garurumon", "Garurumon", "Champion", "Data", "player_candidate", 180, 1.35, 17, 9, ["weregarurumon"], "Gabumon route", "#70c7ff", 29),
   monster("devimon", "Devimon", "Champion", "Virus", "player_candidate", 190, 1.08, 19, 10, ["skullgreymon"], "Virus / area route", "#b178ff", 29),
-  monster("angemon", "Angemon", "Champion", "Vaccine", "enemy", 185, 1.08, 18, 10, ["andromon"], "Patamon branch / wild enemy discovery", "#fff0a8", 29),
+  monster("angemon", "Angemon", "Champion", "Vaccine", "player_candidate", 185, 1.08, 18, 10, ["holyangemon"], "Patamon branch / wild enemy discovery", "#fff0a8", 29),
   monster("kuwagamon", "Kuwagamon", "Champion", "Virus", "enemy", 205, 1.0, 21, 10, ["andromon"], "Tentomon or Palmon branch / wild enemy discovery", "#76ff72", 30),
   monster("birdramon", "Birdramon", "Champion", "Data", "player_candidate", 175, 1.28, 18, 10, ["garudamon"], "Biyomon branch", "#ff7048", 29),
   monster("kabuterimon", "Kabuterimon", "Champion", "Vaccine", "player_candidate", 210, 0.94, 21, 10, ["megakabuterimon"], "Tentomon branch / sprite pending", "#44e7ff", 30),
   monster("ikkakumon", "Ikkakumon", "Champion", "Free", "player_candidate", 205, 0.92, 20, 10, ["zudomon"], "Gomamon branch", "#8ee8ff", 31),
+  monster("togemon", "Togemon", "Champion", "Data", "player_candidate", 195, 0.92, 19, 10, ["lilymon"], "Palmon branch", "#d9b52c", 29),
+  monster("tailmon", "Tailmon", "Champion", "Vaccine", "player_candidate", 170, 1.32, 18, 10, ["angewomon"], "Plotmon branch", "#c99dff", 28),
   monster("metalgreymon", "MetalGreymon", "Ultimate", "Vaccine", "player_candidate", 330, 0.88, 34, 16, ["wargreymon"], "Greymon + boss data", "#ff6a3d", 36),
   monster("weregarurumon", "WereGarurumon", "Ultimate", "Data", "player_candidate", 285, 1.42, 30, 16, ["metalgarurumon"], "Garurumon route", "#8ed8ff", 35),
-  monster("skullgreymon", "SkullGreymon", "Ultimate", "Virus", "player_candidate", 350, 0.82, 38, 18, ["machinedramon"], "Dark Greymon route", "#d8d8d8", 36),
-  monster("andromon", "Andromon", "Ultimate", "Vaccine", "enemy", 310, 0.9, 32, 17, ["machinedramon"], "15:00+ wild enemy / machine branch discovery", "#bfc8d4", 35),
+  monster("skullgreymon", "SkullGreymon", "Ultimate", "Virus", "player_candidate", 350, 0.82, 38, 18, ["mugendramon"], "Dark Greymon route", "#d8d8d8", 36),
+  monster("andromon", "Andromon", "Ultimate", "Vaccine", "enemy", 310, 0.9, 32, 17, ["mugendramon"], "15:00+ wild enemy / machine branch discovery", "#bfc8d4", 35),
   monster("garudamon", "Garudamon", "Ultimate", "Data", "player_candidate", 300, 1.24, 32, 17, ["hououmon", "phoenixmon"], "Birdramon branch", "#ff7a22", 36),
   monster("megakabuterimon", "MegaKabuterimon", "Ultimate", "Vaccine", "player_candidate", 345, 0.86, 36, 17, ["herculeskabuterimon"], "Kabuterimon branch", "#8268ff", 36),
   monster("zudomon", "Zudomon", "Ultimate", "Free", "player_candidate", 360, 0.82, 37, 17, ["vikemon"], "Ikkakumon branch", "#8ecf72", 37),
+  monster("holyangemon", "HolyAngemon", "Ultimate", "Vaccine", "player_candidate", 320, 1.05, 32, 17, ["holydramon"], "Angemon branch", "#ffe46a", 36),
+  monster("lilymon", "Lilymon", "Ultimate", "Data", "player_candidate", 285, 1.22, 30, 17, ["rosemon"], "Togemon branch", "#a8ff7a", 35),
+  monster("angewomon", "Angewomon", "Ultimate", "Vaccine", "player_candidate", 295, 1.18, 31, 17, ["holydramon"], "Tailmon branch", "#ffd1ee", 35),
   monster("wargreymon", "WarGreymon", "Mega", "Vaccine", "player_candidate", 460, 1.08, 48, 28, [], "MetalGreymon route", "#ffd45c", 42),
   monster("metalgarurumon", "MetalGarurumon", "Mega", "Data", "player_candidate", 420, 1.35, 44, 28, [], "WereGarurumon route", "#8ee8ff", 41),
   monster("machinedramon", "Machinedramon", "Mega", "Virus", "player_candidate", 500, 0.78, 54, 32, [], "Virus machine route", "#ff3e71", 42),
+  monster("mugendramon", "Mugendramon", "Mega", "Virus", "player_candidate", 505, 0.78, 55, 32, [], "Dark machine route", "#8f5cff", 42),
   monster("hououmon", "Hououmon", "Mega", "Vaccine", "player_candidate", 430, 1.18, 46, 28, [], "Garudamon + Vaccine route", "#ffb12a", 42),
   monster("phoenixmon", "Phoenixmon", "Mega", "Data", "player_candidate", 420, 1.26, 45, 28, [], "Garudamon + Data route", "#ff6a22", 42),
   monster("herculeskabuterimon", "HerculesKabuterimon", "Mega", "Vaccine", "player_candidate", 510, 0.84, 52, 30, [], "MegaKabuterimon route", "#6d8dff", 43),
-  monster("vikemon", "Vikemon", "Mega", "Free", "player_candidate", 500, 0.88, 50, 30, [], "Zudomon route", "#8ed8ff", 43)
+  monster("vikemon", "Vikemon", "Mega", "Free", "player_candidate", 500, 0.88, 50, 30, [], "Zudomon route", "#8ed8ff", 43),
+  monster("holydramon", "Holydramon", "Mega", "Vaccine", "player_candidate", 455, 1.06, 47, 28, [], "HolyAngemon or Angewomon route", "#bcefff", 42),
+  monster("rosemon", "Rosemon", "Mega", "Data", "player_candidate", 430, 1.16, 46, 28, [], "Lilymon route", "#ff5c96", 42),
+  monster("diaboromon", "Diaboromon", "Mega", "Virus", "final_boss", 1800, 0.94, 60, 0, [], "Final boss: appears 20s after Mega evolution", "#a35cff", 48)
 ];
 
 function monster(id, name, stage, attribute, role, hp, speed, attack, exp, evolutionTo, unlockCondition, color, radius) {
@@ -157,13 +171,13 @@ const ENEMY_ARCHETYPES = {
 };
 
 const ENEMY_SPAWN_TABLE = [
-  { until: 180, ids: ["botamon", "koromon", "tsunomon", "agumon", "tentomon"] },
-  { until: 480, ids: ["agumon", "gabumon", "tentomon", "patamon", "palmon", "gomamon", "biyomon"] },
-  { until: 900, ids: ["greymon", "garurumon", "devimon", "angemon", "kuwagamon", "birdramon", "kabuterimon", "ikkakumon"] },
-  { until: Infinity, ids: ["metalgreymon", "skullgreymon", "andromon", "machinedramon", "weregarurumon", "garudamon", "megakabuterimon", "zudomon"] }
+  { until: 180, ids: ["botamon", "babumon", "tanemon", "koromon", "tsunomon", "agumon", "tentomon"] },
+  { until: 480, ids: ["agumon", "gabumon", "tentomon", "patamon", "palmon", "gomamon", "biyomon", "plotmon", "kokuwamon"] },
+  { until: 900, ids: ["greymon", "garurumon", "devimon", "angemon", "kuwagamon", "birdramon", "kabuterimon", "ikkakumon", "togemon", "tailmon"] },
+  { until: Infinity, ids: ["metalgreymon", "skullgreymon", "andromon", "machinedramon", "weregarurumon", "garudamon", "megakabuterimon", "zudomon", "holyangemon", "lilymon", "angewomon"] }
 ];
 
-const BOSS_POOL = ["greymon", "garurumon", "devimon", "metalgreymon", "skullgreymon", "machinedramon", "garudamon", "megakabuterimon", "zudomon"];
+const BOSS_POOL = ["greymon", "garurumon", "devimon", "metalgreymon", "skullgreymon", "machinedramon", "garudamon", "megakabuterimon", "zudomon", "holyangemon", "lilymon", "angewomon"];
 
 const keys = new Set();
 const touchMove = { x: 0, y: 0, activeId: null };
@@ -175,6 +189,7 @@ let audioCtx = null;
 let resizeQueued = true;
 let nextEnemyId = 1;
 let starterSelected = false;
+let specialCutinLock = false;
 
 const state = createInitialState();
 
@@ -215,6 +230,9 @@ function createInitialState(starterId = "botamon") {
     data: { Vaccine: 0, Data: 0, Virus: 0, Free: 0 },
     upgradeCounts: { power: 0, speed: 0, area: 0, regen: 0, cooldown: 0, magnet: 0 },
     bossesDefeated: 0,
+    megaReachedAt: null,
+    finalBossSpawned: false,
+    finalBossDefeated: false,
     enemies: [],
     projectiles: [],
     pickups: [],
@@ -235,11 +253,13 @@ function resetGame() {
   pausedForChoice = false;
   evolutionLock = false;
   gameEnded = false;
+  specialCutinLock = false;
   ui.levelPanel.classList.add("hidden");
   ui.starterPanel.classList.remove("hidden");
   ui.evolutionOverlay.classList.add("hidden");
   ui.specialCutin.classList.add("hidden");
   ui.gameOverPanel.classList.add("hidden");
+  ui.endingCredit.classList.add("hidden");
   ui.codexPanel.classList.add("hidden");
   resetTouchMove();
   nextEnemyId = 1;
@@ -257,9 +277,11 @@ function beginRun(starterId) {
   pausedForChoice = false;
   evolutionLock = false;
   gameEnded = false;
+  specialCutinLock = false;
   ui.starterPanel.classList.add("hidden");
   ui.levelPanel.classList.add("hidden");
   ui.gameOverPanel.classList.add("hidden");
+  ui.endingCredit.classList.add("hidden");
   ui.codexPanel.classList.add("hidden");
   resetTouchMove();
   nextEnemyId = 1;
@@ -315,14 +337,15 @@ function startAudio() {
   }
 }
 
-function spawnEnemy(forceBoss = false) {
+function spawnEnemy(forceBoss = false, forcedId = null) {
   const angle = Math.random() * Math.PI * 2;
   const distance = 520 + Math.random() * 260;
-  const monsterData = pickEnemyMonster(forceBoss);
+  const monsterData = forcedId ? (MONSTER_BY_ID[forcedId] || MONSTER_BY_ID.botamon) : pickEnemyMonster(forceBoss);
   const type = monsterData.attribute;
   const base = ENEMY_ARCHETYPES[type] || ENEMY_ARCHETYPES.Free;
   const scale = 1 + state.elapsed / 240;
-  const bossScale = forceBoss ? 8 + state.bossesDefeated * 2.5 : 1;
+  const finalBoss = forcedId === "diaboromon";
+  const bossScale = finalBoss ? 18 + state.player.level * 0.9 : forceBoss ? 8 + state.bossesDefeated * 2.5 : 1;
   const x = clamp(state.player.x + Math.cos(angle) * distance, 60, state.worldSize - 60);
   const y = clamp(state.player.y + Math.sin(angle) * distance, 60, state.worldSize - 60);
   const enemyHp = Math.max(base.hp, monsterData.hp * 0.18) * scale * bossScale;
@@ -335,19 +358,29 @@ function spawnEnemy(forceBoss = false) {
     y,
     type,
     boss: forceBoss,
+    finalBoss,
     hp: enemyHp,
     maxHp: enemyHp,
-    speed: base.speed * monsterData.speed * (forceBoss ? 0.6 : 1),
+    speed: base.speed * monsterData.speed * (forceBoss ? 0.52 : 1),
     xp: Math.round(monsterData.exp * scale * (forceBoss ? 10 : 1)),
     radius: forceBoss ? monsterData.radius * 1.2 : monsterData.radius * 0.65,
     color: monsterData.color || base.color,
-    damage: forceBoss ? monsterData.attack * 1.4 : monsterData.attack * 0.45
+    damage: finalBoss ? monsterData.attack * 1.7 : forceBoss ? monsterData.attack * 1.4 : monsterData.attack * 0.45
   });
 
   if (forceBoss) {
     playTone(120, 0.45, "sawtooth", 0.05);
     state.shake = 18;
   }
+}
+
+function spawnFinalBoss() {
+  if (state.finalBossSpawned || gameEnded) return;
+  state.finalBossSpawned = true;
+  state.bossTimer = Infinity;
+  spawnEnemy(true, "diaboromon");
+  state.shake = 30;
+  playTone(72, 0.7, "sawtooth", 0.06);
 }
 
 function pickEnemyMonster(forceBoss) {
@@ -368,6 +401,9 @@ function update(dt) {
   state.spawnTimer -= dt;
   state.bossTimer -= dt;
   state.shake = Math.max(0, state.shake - dt * 28);
+  if (state.megaReachedAt !== null && !state.finalBossSpawned && state.elapsed - state.megaReachedAt >= 20) {
+    spawnFinalBoss();
+  }
 
   const spawnRate = Math.max(0.09, 0.62 - state.elapsed * 0.006);
   if (state.spawnTimer <= 0) {
@@ -376,7 +412,7 @@ function update(dt) {
     if (state.elapsed > 90 && Math.random() < 0.18) spawnEnemy(false);
   }
 
-  if (state.bossTimer <= 0) {
+  if (!state.finalBossSpawned && state.bossTimer <= 0) {
     state.bossTimer = 75;
     spawnEnemy(true);
   }
@@ -391,9 +427,7 @@ function update(dt) {
   updateSpecialEffects(dt);
   tryEvolution();
 
-  if (state.elapsed >= 30 * 60) {
-    endGame(true);
-  }
+  if (state.elapsed >= 30 * 60 && !state.finalBossSpawned) spawnFinalBoss();
 }
 
 function updateSpecialCooldown(dt) {
@@ -520,16 +554,19 @@ function specialMoveName(form = currentForm()) {
     wargreymon: "Brave Tornado",
     metalgarurumon: "Cocytus Barrage",
     machinedramon: "Infinity Cannon",
+    mugendramon: "Mugen Cannon",
     hououmon: "Holy Flame",
     phoenixmon: "Crimson Rebirth",
     herculeskabuterimon: "Giga Scissor",
-    vikemon: "Arctic Hammer"
+    vikemon: "Arctic Hammer",
+    holydramon: "Holy Blaze",
+    rosemon: "Forbidden Temptation"
   };
   return names[form.id] || "Special Move";
 }
 
 function triggerSpecialMove() {
-  if (pausedForChoice || evolutionLock || gameEnded || ui.codexPanel.classList.contains("hidden") === false) return false;
+  if (specialCutinLock || pausedForChoice || evolutionLock || gameEnded || ui.codexPanel.classList.contains("hidden") === false) return false;
 
   const p = state.player;
   const form = currentForm();
@@ -544,14 +581,33 @@ function triggerSpecialMove() {
     return false;
   }
 
-  startAudio();
-  if (isMegaForm(form)) showSpecialCutin(form);
-  executeSpecialMove(form);
   p.specialCooldown = isMegaForm(form) ? 18 : 14;
   p.specialCooldownLeft = p.specialCooldown;
-  state.shake = Math.max(state.shake, isMegaForm(form) ? 22 : 13);
-  playTone(isMegaForm(form) ? 95 : 150, isMegaForm(form) ? 0.26 : 0.16, "sawtooth", 0.04);
+  startAudio();
+  if (isMegaForm(form)) {
+    triggerMegaSpecialCutin(form);
+    return true;
+  }
+  executeSpecialMove(form);
+  state.shake = Math.max(state.shake, 13);
+  playTone(150, 0.16, "sawtooth", 0.04);
   return true;
+}
+
+function triggerMegaSpecialCutin(form) {
+  specialCutinLock = true;
+  pausedForChoice = true;
+  showSpecialCutin(form, 2000);
+  state.shake = Math.max(state.shake, 8);
+  playTone(95, 0.26, "sawtooth", 0.04);
+  window.setTimeout(() => {
+    executeSpecialMove(form);
+    ui.specialCutin.classList.add("hidden");
+    state.shake = Math.max(state.shake, 22);
+    specialCutinLock = false;
+    pausedForChoice = false;
+    lastTime = performance.now();
+  }, 2000);
 }
 
 function executeSpecialMove(form) {
@@ -589,6 +645,10 @@ function executeSpecialMove(form) {
       areaBlast(310, power * 1.25, color, "infinity");
       rapidLockOn(10, power * 0.9, color, 620);
     },
+    mugendramon: () => {
+      areaBlast(320, power * 1.3, color, "mugen");
+      rapidLockOn(12, power * 0.95, color, 660);
+    },
     hououmon: () => {
       areaBlast(310, power * 1.1, color, "holy");
       radialPierce(20, power * 0.58, color, 820, 0.9, 3);
@@ -605,6 +665,15 @@ function executeSpecialMove(form) {
     vikemon: () => {
       areaBlast(360, power * 1.3, color, "arctic");
       rapidLockOn(8, power * 0.72, color, 680);
+    },
+    holydramon: () => {
+      p.hp = Math.min(p.maxHp, p.hp + 100);
+      areaBlast(340, power * 1.2, color, "holy-dragon");
+      radialPierce(18, power * 0.62, color, 840, 0.92, 3);
+    },
+    rosemon: () => {
+      areaBlast(330, power * 1.2, color, "rose");
+      rapidLockOn(14, power * 0.72, color, 760);
     }
   };
   (actions[form.id] || (() => areaBlast(210, power, color, "special")))();
@@ -679,13 +748,15 @@ function rapidLockOn(count, damage, color, speed) {
   if (fallbackCount > 0) radialPierce(Math.min(12, fallbackCount), damage, color, speed, 0.75, 1);
 }
 
-function showSpecialCutin(form) {
+function showSpecialCutin(form, duration = 920) {
   const image = getAnimatedSprite(form, 280);
   ui.cutinImage.src = image ? image.src : form.sprites[0];
   ui.cutinImage.alt = form.name;
   ui.cutinName.textContent = `${form.name} / ${specialMoveName(form)}`;
   ui.specialCutin.classList.remove("hidden");
-  window.setTimeout(() => ui.specialCutin.classList.add("hidden"), 920);
+  window.setTimeout(() => {
+    if (!specialCutinLock) ui.specialCutin.classList.add("hidden");
+  }, duration);
 }
 
 function updateEnemies(dt) {
@@ -773,6 +844,15 @@ function updatePassiveEffects(dt) {
 }
 
 function killEnemy(enemy) {
+  if (enemy.finalBoss) {
+    state.finalBossDefeated = true;
+    state.discovered[enemy.monsterId] = true;
+    saveCodex();
+    burst(enemy.x, enemy.y, enemy.color, 120);
+    playTone(980, 0.32, "sawtooth", 0.055);
+    endGame(true);
+    return;
+  }
   state.player.xp += enemy.xp;
   state.data[enemy.type] += enemy.boss ? 8 : 1;
   if (enemy.monsterId) {
@@ -983,6 +1063,11 @@ function pickEvolutionCandidate(form) {
   if (p.level < requiredLevel) return null;
 
   const route = {
+    tanemon: () => {
+      if (d.Vaccine >= 8 || u.shield >= 1 || u.beam >= 1) return "plotmon";
+      if (d.Virus >= 8 || u.drones >= 1 || u.orbit >= 1) return "kokuwamon";
+      return "palmon";
+    },
     babumon: () => {
       if (d.Vaccine >= 8 || u.power >= 1 || u.shield >= 1) return "tentomon";
       if (d.Free >= 8 || u.magnet >= 1 || u.regen >= 1) return "gomamon";
@@ -1001,24 +1086,31 @@ function pickEvolutionCandidate(form) {
     gabumon: () => "garurumon",
     patamon: () => "angemon",
     tentomon: () => "kabuterimon",
-    palmon: () => "kuwagamon",
+    palmon: () => "togemon",
+    plotmon: () => "tailmon",
+    kokuwamon: () => "kabuterimon",
     gomamon: () => "ikkakumon",
     biyomon: () => "birdramon",
     greymon: () => (d.Virus >= 36 || u.chain >= 2 ? "skullgreymon" : "metalgreymon"),
     garurumon: () => "weregarurumon",
     devimon: () => "skullgreymon",
-    angemon: () => "andromon",
+    angemon: () => "holyangemon",
     kuwagamon: () => "andromon",
     birdramon: () => "garudamon",
     kabuterimon: () => "megakabuterimon",
     ikkakumon: () => "zudomon",
+    togemon: () => "lilymon",
+    tailmon: () => "angewomon",
     metalgreymon: () => "wargreymon",
     weregarurumon: () => "metalgarurumon",
-    skullgreymon: () => "machinedramon",
-    andromon: () => "machinedramon",
+    skullgreymon: () => "mugendramon",
+    andromon: () => "mugendramon",
     garudamon: () => (d.Vaccine >= d.Data ? "hououmon" : "phoenixmon"),
     megakabuterimon: () => "herculeskabuterimon",
-    zudomon: () => "vikemon"
+    zudomon: () => "vikemon",
+    holyangemon: () => "holydramon",
+    lilymon: () => "rosemon",
+    angewomon: () => "holydramon"
   };
 
   const picked = route[form.id] ? route[form.id]() : form.evolutionTo[0];
@@ -1036,6 +1128,10 @@ function evolveTo(formId) {
   applyEvolutionBonus(formId);
   if (hasSpecialMove(form)) {
     state.player.specialCooldownLeft = 0;
+  }
+  if (isMegaForm(form) && state.megaReachedAt === null) {
+    state.megaReachedAt = state.elapsed;
+    state.bossTimer = Infinity;
   }
   state.discovered[formId] = true;
   saveCodex();
@@ -1086,6 +1182,18 @@ function applyEvolutionBonus(formId) {
       p.effects.drones += 1;
       p.effects.shield += 1;
     },
+    palmon: () => {
+      p.effects.nova += 1;
+      p.magnet *= 1.12;
+    },
+    plotmon: () => {
+      p.effects.shield += 1;
+      p.speed *= 1.08;
+    },
+    kokuwamon: () => {
+      p.effects.drones += 1;
+      p.effects.chain += 1;
+    },
     devimon: () => {
       p.effects.orbit += 1;
       p.effects.chain += 1;
@@ -1119,6 +1227,14 @@ function applyEvolutionBonus(formId) {
       p.maxHp += 16;
       p.hp = Math.min(p.maxHp, p.hp + 32);
     },
+    togemon: () => {
+      p.effects.orbit += 1;
+      p.effects.nova += 1;
+    },
+    tailmon: () => {
+      p.speed *= 1.14;
+      p.effects.beam += 1;
+    },
     metalgreymon: () => {
       p.effects.beam += 2;
       p.effects.shield += 1;
@@ -1149,6 +1265,21 @@ function applyEvolutionBonus(formId) {
       p.effects.chain += 1;
       p.attack *= 1.1;
     },
+    holyangemon: () => {
+      p.effects.shield += 2;
+      p.effects.beam += 2;
+      p.maxHp += 24;
+    },
+    lilymon: () => {
+      p.effects.nova += 2;
+      p.effects.orbit += 1;
+      p.speed *= 1.08;
+    },
+    angewomon: () => {
+      p.effects.beam += 2;
+      p.effects.shield += 1;
+      p.speed *= 1.06;
+    },
     wargreymon: () => {
       p.effects.beam += 3;
       p.effects.nova += 1;
@@ -1161,6 +1292,11 @@ function applyEvolutionBonus(formId) {
       p.effects.drones += 2;
       p.effects.nova += 2;
       p.effects.orbit += 1;
+    },
+    mugendramon: () => {
+      p.effects.drones += 3;
+      p.effects.chain += 2;
+      p.effects.shield += 1;
     },
     hououmon: () => {
       p.effects.nova += 3;
@@ -1180,6 +1316,16 @@ function applyEvolutionBonus(formId) {
       p.effects.shield += 3;
       p.effects.chain += 2;
       p.attack *= 1.15;
+    },
+    holydramon: () => {
+      p.effects.shield += 3;
+      p.effects.beam += 3;
+      p.maxHp += 48;
+    },
+    rosemon: () => {
+      p.effects.nova += 4;
+      p.effects.orbit += 2;
+      p.speed *= 1.12;
     }
   };
   if (bonus[formId]) bonus[formId]();
@@ -1392,7 +1538,7 @@ function drawEnemies() {
     if (enemy.boss) {
       ctx.font = "bold 10px Segoe UI";
       ctx.textAlign = "center";
-      ctx.fillText("BOSS", 0, enemy.radius + 16);
+      ctx.fillText(enemy.finalBoss ? "FINAL BOSS" : "BOSS", 0, enemy.radius + 16);
     }
     ctx.restore();
   }
@@ -1530,6 +1676,9 @@ function evoReadiness() {
   if (p.formId === "babumon") {
     return clamp(Math.round((Math.max(d.Vaccine, d.Data, d.Free) / 14) * 100), 0, 100);
   }
+  if (p.formId === "tanemon") {
+    return clamp(Math.round((Math.max(d.Data, d.Vaccine, d.Virus) / 14) * 100), 0, 100);
+  }
   if (p.formId === "koromon") {
     return clamp(Math.round((Math.max(d.Vaccine, d.Free * 0.6) / 14) * 100), 0, 100);
   }
@@ -1607,10 +1756,12 @@ function hydrateStarterPreviews() {
 
 function endGame(cleared) {
   gameEnded = true;
-  ui.resultTitle.textContent = cleared ? "SURVIVED 30:00" : "GAME OVER";
+  ui.resultTitle.textContent = cleared ? "DIABOROMON DELETED" : "GAME OVER";
   ui.resultText.textContent = cleared
-    ? `図鑑登録 ${Object.keys(state.discovered).length}/${FORMS.length}。究極体ルートをさらに解析できます。`
+    ? `ENDING UNLOCKED / CODEX ${Object.keys(state.discovered).length}/${FORMS.length}. Tap the credit logo to jump to the shopping street.`
     : `接続時間 ${formatTime(state.elapsed)}。吸収データと能力選択を変えると別ルートへ進化します。`;
+  ui.endingCredit.href = SHOTENGAI_URL;
+  ui.endingCredit.classList.toggle("hidden", !cleared);
   ui.gameOverPanel.classList.remove("hidden");
 }
 
@@ -1682,6 +1833,7 @@ function resetTouchMove() {
 }
 
 function togglePause() {
+  if (specialCutinLock) return;
   pausedForChoice = !pausedForChoice;
   ui.levelPanel.classList.add("hidden");
 }
