@@ -54,6 +54,8 @@ const STAGES = [
   { name: "Deep Digital World", color: "#ff3e71", enemyBias: ["Virus", "Vaccine"] }
 ];
 
+const SPRITE_ASSET_VERSION = "plotmon-hououmon-20260710";
+
 const MONSTERS = [
   monster("botamon", "Botamon", "Fresh", "Free", "player_candidate", 90, 1.0, 8, 3, ["koromon", "tsunomon"], null, "#7cffe9", 17),
   monster("babumon", "Babumon", "Fresh", "Free", "player_candidate", 88, 1.08, 8, 3, ["biyomon", "tentomon", "gomamon"], null, "#c7fff2", 17),
@@ -114,7 +116,7 @@ function monster(id, name, stage, attribute, role, hp, speed, attack, exp, evolu
     speed,
     attack,
     exp,
-    sprites: [`assets/sprites/${id}_01.png`, `assets/sprites/${id}_02.png`],
+    sprites: [`assets/sprites/${id}_01.png?v=${SPRITE_ASSET_VERSION}`, `assets/sprites/${id}_02.png?v=${SPRITE_ASSET_VERSION}`],
     evolutionTo,
     evolutionFrom: [],
     unlockCondition,
