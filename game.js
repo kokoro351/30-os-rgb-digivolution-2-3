@@ -180,7 +180,7 @@ const ENEMY_ARCHETYPES = {
 };
 
 const ENEMY_SPAWN_TABLE = [
-  { until: 180, ids: ["botamon", "babumon", "tanemon", "koromon", "tsunomon", "agumon", "tentomon"] },
+  { until: 180, ids: ["botamon", "babumon", "tanemon", "koromon", "tsunomon", "agumon", "tentomon", "kokuwamon"] },
   { until: 480, ids: ["agumon", "gabumon", "tentomon", "patamon", "palmon", "gomamon", "biyomon", "plotmon", "kokuwamon"] },
   { until: 900, ids: ["greymon", "garurumon", "devimon", "angemon", "kuwagamon", "birdramon", "kabuterimon", "ikkakumon", "togemon", "tailmon"] },
   { until: Infinity, ids: ["metalgreymon", "skullgreymon", "andromon", "machinedramon", "weregarurumon", "garudamon", "megakabuterimon", "zudomon", "holyangemon", "lilymon", "angewomon"] }
@@ -912,11 +912,13 @@ function killEnemy(enemy) {
   if (enemy.boss) {
     state.bossesDefeated += 1;
   }
-  for (let i = 0; i < (enemy.boss ? 18 : 5); i += 1) {
+  const pickupCount = enemy.boss ? 18 : 5;
+  const pickupTypes = balancedPickupTypes(enemy.type, pickupCount);
+  for (let i = 0; i < pickupCount; i += 1) {
     state.pickups.push({
       x: enemy.x + rand(-18, 18),
       y: enemy.y + rand(-18, 18),
-      type: enemy.type,
+      type: pickupTypes[i] || enemy.type,
       value: enemy.boss ? 2 : 1,
       radius: enemy.boss ? 5 : 3
     });
@@ -927,6 +929,22 @@ function killEnemy(enemy) {
   while (state.player.xp >= state.player.xpNext) {
     levelUp();
   }
+}
+
+function balancedPickupTypes(preferredType, count) {
+  const virtualCounts = { ...state.data };
+  const types = [];
+  for (let i = 0; i < count; i += 1) {
+    const minCount = Math.min(...DATA_TYPES.map((type) => virtualCounts[type] || 0));
+    const candidates = DATA_TYPES.filter((type) => (virtualCounts[type] || 0) <= minCount + 1);
+    let type = candidates[Math.floor(Math.random() * candidates.length)];
+    if (candidates.includes(preferredType) && Math.random() < 0.35) {
+      type = preferredType;
+    }
+    virtualCounts[type] = (virtualCounts[type] || 0) + 1;
+    types.push(type);
+  }
+  return types;
 }
 
 function dropEarlyVaccineShard(enemy) {
