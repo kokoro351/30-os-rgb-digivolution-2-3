@@ -42,7 +42,13 @@ const ui = {
   cutinName: document.getElementById("cutinName")
 };
 
-const DATA_TYPES = ["Vaccine", "Data", "Virus", "Free"];
+const DATA_TYPES = ["Vaccine", "Virus", "Data", "Free"];
+const DATA_TYPE_COLORS = {
+  Virus: "#ff3e71",
+  Vaccine: "#4aa8ff",
+  Data: "#ffdf5c",
+  Free: "#ffffff"
+};
 const STARTERS = ["botamon", "babumon", "tanemon"];
 const SHOTENGAI_URL = "https://natsuyasumi-shotengai.vercel.app/";
 const SPECIAL_STAGE_ORDER = { Fresh: 0, "In-Training": 1, Rookie: 2, Champion: 3, Ultimate: 4, Mega: 5 };
@@ -167,10 +173,10 @@ function preloadSpriteImages() {
 }
 
 const ENEMY_ARCHETYPES = {
-  Vaccine: { color: "#75ff9e", hp: 18, speed: 52, xp: 5 },
-  Data: { color: "#4ff6ff", hp: 15, speed: 66, xp: 5 },
-  Virus: { color: "#ff3e71", hp: 22, speed: 44, xp: 7 },
-  Free: { color: "#ffe66b", hp: 12, speed: 58, xp: 4 }
+  Vaccine: { color: DATA_TYPE_COLORS.Vaccine, hp: 18, speed: 52, xp: 5 },
+  Data: { color: DATA_TYPE_COLORS.Data, hp: 15, speed: 66, xp: 5 },
+  Virus: { color: DATA_TYPE_COLORS.Virus, hp: 22, speed: 44, xp: 7 },
+  Free: { color: DATA_TYPE_COLORS.Free, hp: 12, speed: 58, xp: 4 }
 };
 
 const ENEMY_SPAWN_TABLE = [
@@ -1604,7 +1610,7 @@ function drawProjectiles() {
 function drawPickups() {
   for (const pickup of state.pickups) {
     const pos = toScreen(pickup.x, pickup.y);
-    const color = ENEMY_ARCHETYPES[pickup.type].color;
+    const color = DATA_TYPE_COLORS[pickup.type] || "#ffffff";
     ctx.fillStyle = color;
     ctx.shadowColor = color;
     ctx.shadowBlur = 9;
@@ -1744,7 +1750,7 @@ function updateHud() {
   ui.stageText.textContent = currentStage().name;
   ui.evoGaugeText.textContent = `${evoReadiness()}%`;
 
-  ui.dataGrid.innerHTML = DATA_TYPES.map((type) => `<div class="data-chip">${type}<br><strong>${state.data[type]}</strong></div>`).join("");
+  ui.dataGrid.innerHTML = DATA_TYPES.map((type) => `<div class="data-chip" data-type="${type}">${type}<br><strong>${state.data[type]}</strong></div>`).join("");
   ui.skillList.innerHTML = p.skills.length
     ? p.skills.map((skill) => `<li><span>${skill.name}</span><strong>Lv${skill.count}</strong></li>`).join("")
     : "<li><span>Basic Bit</span><strong>Lv1</strong></li>";
