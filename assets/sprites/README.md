@@ -22,6 +22,8 @@ assets/sprites/ikkakumon_01.png
 assets/sprites/ikkakumon_02.png
 assets/sprites/garudamon_01.png
 assets/sprites/garudamon_02.png
+assets/sprites/kabuterimon_01.png
+assets/sprites/kabuterimon_02.png
 assets/sprites/megakabuterimon_01.png
 assets/sprites/megakabuterimon_02.png
 assets/sprites/zudomon_01.png
@@ -37,12 +39,5 @@ assets/sprites/vikemon_02.png
 ```
 
 If an image is missing, the game falls back to an attribute-colored placeholder and keeps running.
-
-`Kabuterimon` is currently data-only. Add these files later to replace the fallback:
-
-```text
-assets/sprites/kabuterimon_01.png
-assets/sprites/kabuterimon_02.png
-```
 
 Legacy single-frame files such as `agumon.png` may remain in the folder, but the current runtime uses the `_01` / `_02` frame files.
