@@ -59,23 +59,32 @@ const MONSTERS = [
   monster("agumon", "Agumon", "Rookie", "Vaccine", "player_candidate", 120, 1.1, 12, 5, ["greymon", "devimon"], "Koromon route", "#ffb340", 22),
   monster("gabumon", "Gabumon", "Rookie", "Data", "player_candidate", 112, 1.2, 11, 5, ["garurumon"], "Tsunomon route", "#65d9ff", 22),
   monster("patamon", "Patamon", "Rookie", "Free", "enemy", 95, 1.18, 9, 5, ["angemon"], "Wild enemy 03:00-08:00 / defeat to register", "#ffe66b", 20),
-  monster("tentomon", "Tentomon", "Rookie", "Vaccine", "player_candidate", 112, 0.95, 10, 5, ["kuwagamon"], "Babumon + Vaccine route / wild enemy 03:00-08:00", "#75ff9e", 21),
+  monster("tentomon", "Tentomon", "Rookie", "Vaccine", "player_candidate", 112, 0.95, 10, 5, ["kabuterimon"], "Babumon + Vaccine route / wild enemy 03:00-08:00", "#75ff9e", 21),
   monster("palmon", "Palmon", "Rookie", "Data", "enemy", 102, 1.0, 9, 5, ["kuwagamon"], "Wild enemy 03:00-08:00 / defeat to register", "#9dff70", 20),
-  monster("gomamon", "Gomamon", "Rookie", "Free", "player_candidate", 108, 1.08, 10, 5, ["garurumon"], "Babumon + Free route / wild enemy 03:00-08:00", "#e7f7ff", 20),
+  monster("gomamon", "Gomamon", "Rookie", "Free", "player_candidate", 108, 1.08, 10, 5, ["ikkakumon"], "Babumon + Free route / wild enemy 03:00-08:00", "#e7f7ff", 20),
   monster("biyomon", "Biyomon", "Rookie", "Data", "player_candidate", 98, 1.25, 9, 5, ["birdramon"], "Babumon + Data route / wild enemy 03:00-08:00", "#ff8fcf", 20),
   monster("greymon", "Greymon", "Champion", "Vaccine", "player_candidate", 210, 0.92, 20, 9, ["metalgreymon", "skullgreymon"], "Agumon + power", "#ff6a3d", 30),
   monster("garurumon", "Garurumon", "Champion", "Data", "player_candidate", 180, 1.35, 17, 9, ["weregarurumon"], "Gabumon route", "#70c7ff", 29),
   monster("devimon", "Devimon", "Champion", "Virus", "player_candidate", 190, 1.08, 19, 10, ["skullgreymon"], "Virus / area route", "#b178ff", 29),
   monster("angemon", "Angemon", "Champion", "Vaccine", "enemy", 185, 1.08, 18, 10, ["andromon"], "Patamon branch / wild enemy discovery", "#fff0a8", 29),
   monster("kuwagamon", "Kuwagamon", "Champion", "Virus", "enemy", 205, 1.0, 21, 10, ["andromon"], "Tentomon or Palmon branch / wild enemy discovery", "#76ff72", 30),
-  monster("birdramon", "Birdramon", "Champion", "Data", "enemy", 175, 1.28, 18, 10, ["metalgreymon"], "Biyomon branch / wild enemy discovery", "#ff7048", 29),
+  monster("birdramon", "Birdramon", "Champion", "Data", "player_candidate", 175, 1.28, 18, 10, ["garudamon"], "Biyomon branch", "#ff7048", 29),
+  monster("kabuterimon", "Kabuterimon", "Champion", "Vaccine", "player_candidate", 210, 0.94, 21, 10, ["megakabuterimon"], "Tentomon branch / sprite pending", "#44e7ff", 30),
+  monster("ikkakumon", "Ikkakumon", "Champion", "Free", "player_candidate", 205, 0.92, 20, 10, ["zudomon"], "Gomamon branch", "#8ee8ff", 31),
   monster("metalgreymon", "MetalGreymon", "Ultimate", "Vaccine", "player_candidate", 330, 0.88, 34, 16, ["wargreymon"], "Greymon + boss data", "#ff6a3d", 36),
   monster("weregarurumon", "WereGarurumon", "Ultimate", "Data", "player_candidate", 285, 1.42, 30, 16, ["metalgarurumon"], "Garurumon route", "#8ed8ff", 35),
   monster("skullgreymon", "SkullGreymon", "Ultimate", "Virus", "player_candidate", 350, 0.82, 38, 18, ["machinedramon"], "Dark Greymon route", "#d8d8d8", 36),
   monster("andromon", "Andromon", "Ultimate", "Vaccine", "enemy", 310, 0.9, 32, 17, ["machinedramon"], "15:00+ wild enemy / machine branch discovery", "#bfc8d4", 35),
+  monster("garudamon", "Garudamon", "Ultimate", "Data", "player_candidate", 300, 1.24, 32, 17, ["hououmon", "phoenixmon"], "Birdramon branch", "#ff7a22", 36),
+  monster("megakabuterimon", "MegaKabuterimon", "Ultimate", "Vaccine", "player_candidate", 345, 0.86, 36, 17, ["herculeskabuterimon"], "Kabuterimon branch", "#8268ff", 36),
+  monster("zudomon", "Zudomon", "Ultimate", "Free", "player_candidate", 360, 0.82, 37, 17, ["vikemon"], "Ikkakumon branch", "#8ecf72", 37),
   monster("wargreymon", "WarGreymon", "Mega", "Vaccine", "player_candidate", 460, 1.08, 48, 28, [], "MetalGreymon route", "#ffd45c", 42),
   monster("metalgarurumon", "MetalGarurumon", "Mega", "Data", "player_candidate", 420, 1.35, 44, 28, [], "WereGarurumon route", "#8ee8ff", 41),
-  monster("machinedramon", "Machinedramon", "Mega", "Virus", "player_candidate", 500, 0.78, 54, 32, [], "Virus machine route", "#ff3e71", 42)
+  monster("machinedramon", "Machinedramon", "Mega", "Virus", "player_candidate", 500, 0.78, 54, 32, [], "Virus machine route", "#ff3e71", 42),
+  monster("hououmon", "Hououmon", "Mega", "Vaccine", "player_candidate", 430, 1.18, 46, 28, [], "Garudamon + Vaccine route", "#ffb12a", 42),
+  monster("phoenixmon", "Phoenixmon", "Mega", "Data", "player_candidate", 420, 1.26, 45, 28, [], "Garudamon + Data route", "#ff6a22", 42),
+  monster("herculeskabuterimon", "HerculesKabuterimon", "Mega", "Vaccine", "player_candidate", 510, 0.84, 52, 30, [], "MegaKabuterimon route", "#6d8dff", 43),
+  monster("vikemon", "Vikemon", "Mega", "Free", "player_candidate", 500, 0.88, 50, 30, [], "Zudomon route", "#8ed8ff", 43)
 ];
 
 function monster(id, name, stage, attribute, role, hp, speed, attack, exp, evolutionTo, unlockCondition, color, radius) {
@@ -150,11 +159,11 @@ const ENEMY_ARCHETYPES = {
 const ENEMY_SPAWN_TABLE = [
   { until: 180, ids: ["botamon", "koromon", "tsunomon", "agumon", "tentomon"] },
   { until: 480, ids: ["agumon", "gabumon", "tentomon", "patamon", "palmon", "gomamon", "biyomon"] },
-  { until: 900, ids: ["greymon", "garurumon", "devimon", "angemon", "kuwagamon", "birdramon"] },
-  { until: Infinity, ids: ["metalgreymon", "skullgreymon", "andromon", "machinedramon", "weregarurumon"] }
+  { until: 900, ids: ["greymon", "garurumon", "devimon", "angemon", "kuwagamon", "birdramon", "kabuterimon", "ikkakumon"] },
+  { until: Infinity, ids: ["metalgreymon", "skullgreymon", "andromon", "machinedramon", "weregarurumon", "garudamon", "megakabuterimon", "zudomon"] }
 ];
 
-const BOSS_POOL = ["greymon", "garurumon", "devimon", "metalgreymon", "skullgreymon", "machinedramon"];
+const BOSS_POOL = ["greymon", "garurumon", "devimon", "metalgreymon", "skullgreymon", "machinedramon", "garudamon", "megakabuterimon", "zudomon"];
 
 const keys = new Set();
 const touchMove = { x: 0, y: 0, activeId: null };
@@ -505,9 +514,16 @@ function specialMoveName(form = currentForm()) {
     weregarurumon: "Crescent Rush",
     skullgreymon: "Dark Bone Quake",
     andromon: "Guardromon Protocol",
+    garudamon: "Wing Flare",
+    megakabuterimon: "Horn Buster",
+    zudomon: "Hammer Spark",
     wargreymon: "Brave Tornado",
     metalgarurumon: "Cocytus Barrage",
-    machinedramon: "Infinity Cannon"
+    machinedramon: "Infinity Cannon",
+    hououmon: "Holy Flame",
+    phoenixmon: "Crimson Rebirth",
+    herculeskabuterimon: "Giga Scissor",
+    vikemon: "Arctic Hammer"
   };
   return names[form.id] || "Special Move";
 }
@@ -550,6 +566,17 @@ function executeSpecialMove(form) {
       p.hp = Math.min(p.maxHp, p.hp + 34);
       areaBlast(190, power * 0.8, color, "guard");
     },
+    garudamon: () => {
+      areaBlast(240, power * 0.85, color, "flare");
+      radialPierce(10, power * 0.62, color, 760, 0.82, 2);
+    },
+    megakabuterimon: () => {
+      areaBlast(210, power * 1.05, color, "horn");
+      radialPierce(8, power * 0.75, color, 620, 1.1, 4);
+    },
+    zudomon: () => {
+      areaBlast(250, power * 1.15, color, "hammer");
+    },
     wargreymon: () => {
       areaBlast(260, power * 1.1, color, "brave");
       radialPierce(18, power * 0.72, color, 760, 1.05, 5);
@@ -561,6 +588,23 @@ function executeSpecialMove(form) {
     machinedramon: () => {
       areaBlast(310, power * 1.25, color, "infinity");
       rapidLockOn(10, power * 0.9, color, 620);
+    },
+    hououmon: () => {
+      areaBlast(310, power * 1.1, color, "holy");
+      radialPierce(20, power * 0.58, color, 820, 0.9, 3);
+    },
+    phoenixmon: () => {
+      p.hp = Math.min(p.maxHp, p.hp + 80);
+      areaBlast(330, power * 1.18, color, "rebirth");
+      radialPierce(16, power * 0.62, color, 850, 0.92, 3);
+    },
+    herculeskabuterimon: () => {
+      areaBlast(340, power * 1.35, color, "giga");
+      radialPierce(12, power * 0.9, color, 700, 1.15, 5);
+    },
+    vikemon: () => {
+      areaBlast(360, power * 1.3, color, "arctic");
+      rapidLockOn(8, power * 0.72, color, 680);
     }
   };
   (actions[form.id] || (() => areaBlast(210, power, color, "special")))();
@@ -956,20 +1000,25 @@ function pickEvolutionCandidate(form) {
     },
     gabumon: () => "garurumon",
     patamon: () => "angemon",
-    tentomon: () => "kuwagamon",
+    tentomon: () => "kabuterimon",
     palmon: () => "kuwagamon",
-    gomamon: () => "garurumon",
+    gomamon: () => "ikkakumon",
     biyomon: () => "birdramon",
     greymon: () => (d.Virus >= 36 || u.chain >= 2 ? "skullgreymon" : "metalgreymon"),
     garurumon: () => "weregarurumon",
     devimon: () => "skullgreymon",
     angemon: () => "andromon",
     kuwagamon: () => "andromon",
-    birdramon: () => "metalgreymon",
+    birdramon: () => "garudamon",
+    kabuterimon: () => "megakabuterimon",
+    ikkakumon: () => "zudomon",
     metalgreymon: () => "wargreymon",
     weregarurumon: () => "metalgarurumon",
     skullgreymon: () => "machinedramon",
-    andromon: () => "machinedramon"
+    andromon: () => "machinedramon",
+    garudamon: () => (d.Vaccine >= d.Data ? "hououmon" : "phoenixmon"),
+    megakabuterimon: () => "herculeskabuterimon",
+    zudomon: () => "vikemon"
   };
 
   const picked = route[form.id] ? route[form.id]() : form.evolutionTo[0];
@@ -1060,6 +1109,16 @@ function applyEvolutionBonus(formId) {
       p.effects.nova += 1;
       p.effects.beam += 1;
     },
+    kabuterimon: () => {
+      p.effects.shield += 1;
+      p.effects.beam += 1;
+      p.attack *= 1.08;
+    },
+    ikkakumon: () => {
+      p.effects.shield += 2;
+      p.maxHp += 16;
+      p.hp = Math.min(p.maxHp, p.hp + 32);
+    },
     metalgreymon: () => {
       p.effects.beam += 2;
       p.effects.shield += 1;
@@ -1076,6 +1135,20 @@ function applyEvolutionBonus(formId) {
       p.effects.shield += 1;
       p.effects.drones += 1;
     },
+    garudamon: () => {
+      p.effects.nova += 2;
+      p.speed *= 1.1;
+    },
+    megakabuterimon: () => {
+      p.effects.shield += 2;
+      p.effects.orbit += 1;
+      p.attack *= 1.12;
+    },
+    zudomon: () => {
+      p.effects.shield += 2;
+      p.effects.chain += 1;
+      p.attack *= 1.1;
+    },
     wargreymon: () => {
       p.effects.beam += 3;
       p.effects.nova += 1;
@@ -1088,6 +1161,25 @@ function applyEvolutionBonus(formId) {
       p.effects.drones += 2;
       p.effects.nova += 2;
       p.effects.orbit += 1;
+    },
+    hououmon: () => {
+      p.effects.nova += 3;
+      p.effects.beam += 2;
+    },
+    phoenixmon: () => {
+      p.effects.nova += 3;
+      p.effects.shield += 2;
+      p.maxHp += 36;
+    },
+    herculeskabuterimon: () => {
+      p.effects.shield += 3;
+      p.effects.orbit += 2;
+      p.attack *= 1.18;
+    },
+    vikemon: () => {
+      p.effects.shield += 3;
+      p.effects.chain += 2;
+      p.attack *= 1.15;
     }
   };
   if (bonus[formId]) bonus[formId]();
